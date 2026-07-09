@@ -37,6 +37,9 @@ struct Palette
   QString accentText;  // text on the accent
   QString accentHover; // accent, slightly shifted for hover
   QString accentSoft;  // accent at low alpha (selection wash)
+  QString control;     // raised button fill
+  QString controlHover;
+  QString controlBorder;
 };
 
 QString hex(const QColor &c)
@@ -137,6 +140,9 @@ QString SystemTheme::buildStyleSheet() const
     p.text = "#ffffff";
     p.textDim = "#b0b0b0";
     p.hover = "rgba(255,255,255,0.07)";
+    p.control = "#3c3c3c";
+    p.controlHover = "#474747";
+    p.controlBorder = "#4a4a4a";
   } else {
     // Yaru light
     p.bg = "#f6f6f6";
@@ -147,6 +153,9 @@ QString SystemTheme::buildStyleSheet() const
     p.text = "#2c2c2c";
     p.textDim = "#5c5c5c";
     p.hover = "rgba(0,0,0,0.045)";
+    p.control = "#ececec";
+    p.controlHover = "#e0e0e0";
+    p.controlBorder = "#d4d4d4";
   }
   p.accent = hex(accent);
   p.accentText = isLight(accent) ? QStringLiteral("#1d1d1f") : QStringLiteral("#ffffff");
@@ -208,15 +217,15 @@ QLabel { background: transparent; color: %TEXT%; }
 QLabel[dim="true"] { color: %TEXTDIM%; }
 
 QPushButton {
-  background: %SURFACE%; color: %TEXT%;
-  border: 1px solid %BORDERSTRONG%; border-radius: 8px;
-  padding: 0 18px; min-height: 36px;
+  background: %CONTROL%; color: %TEXT%;
+  border: 1px solid %CONTROLBORDER%; border-radius: 8px;
+  padding: 0 20px; min-height: 38px; font-weight: 600;
 }
-QPushButton:hover { background: %HOVER%; }
-QPushButton:pressed { background: %BORDER%; }
-QPushButton:disabled { color: %TEXTDIM%; border-color: %BORDER%; }
+QPushButton:hover { background: %CONTROLHOVER%; }
+QPushButton:pressed { background: %CONTROLBORDER%; }
+QPushButton:disabled { background: %SURFACEALT%; color: %TEXTDIM%; border-color: %BORDER%; }
 QPushButton:default, QPushButton[accent="true"] {
-  background: %ACCENT%; color: %ACCENTTEXT%; border: 1px solid %ACCENT%;
+  background: %ACCENT%; color: %ACCENTTEXT%; border: 1px solid %ACCENT%; font-weight: 600;
 }
 QPushButton:default:hover, QPushButton[accent="true"]:hover { background: %ACCENTHOVER%; border-color: %ACCENTHOVER%; }
 
@@ -294,6 +303,9 @@ QToolTip {
   qss.replace("%TEXTDIM%", p.textDim);
   qss.replace("%TEXT%", p.text);
   qss.replace("%HOVER%", p.hover);
+  qss.replace("%CONTROLBORDER%", p.controlBorder);
+  qss.replace("%CONTROLHOVER%", p.controlHover);
+  qss.replace("%CONTROL%", p.control);
   qss.replace("%ACCENTSOFT%", p.accentSoft);
   qss.replace("%ACCENTHOVER%", p.accentHover);
   qss.replace("%ACCENTTEXT%", p.accentText);

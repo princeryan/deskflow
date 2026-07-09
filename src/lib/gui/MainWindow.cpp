@@ -217,6 +217,9 @@ void MainWindow::buildAppShell()
   ui->btnEditName->setText(tr("Rename"));
   // Restart is redundant with Connect (which restarts the service); hide it.
   ui->btnRestartCore->setVisible(false);
+  // Primary action sits bottom-right of the card (convention).
+  if (auto *hb = qobject_cast<QHBoxLayout *>(ui->horizontalWidget->layout()))
+    hb->insertStretch(0);
   // No decorative icons on the other action buttons either.
   ui->btnConfigureClient->setIcon(QIcon());
   ui->btnConfigureServer->setIcon(QIcon());
