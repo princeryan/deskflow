@@ -48,9 +48,12 @@ public:
   */
   enum class Format
   {
-    Text,        //!< Text format, UTF-8, newline is LF
-    HTML,        //!< HTML format, HTML fragment, UTF-8, newline is LF
-    Bitmap,      //!< Bitmap format, BMP 24/32bpp, BI_RGB
+    Text,   //!< Text format, UTF-8, newline is LF
+    HTML,   //!< HTML format, HTML fragment, UTF-8, newline is LF
+    Bitmap, //!< Bitmap format, BMP 24/32bpp, BI_RGB
+    File,   //!< File transfer: one or more files serialized as
+            //!< [4B BE count] then per file [4B BE name len][name][8B BE size][bytes].
+            //!< Older peers (< this) ignore it via the TotalFormats check in unmarshall().
     TotalFormats //!< The number of clipboard formats supported
   };
 

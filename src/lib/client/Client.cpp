@@ -299,10 +299,8 @@ void Client::setOptions(const OptionsList &options)
     }
   }
 
-  if (m_enableClipboard && !m_maximumClipboardSize) {
-    m_enableClipboard = false;
-    LOG_NOTE("clipboard sharing is disabled because the server set the maximum clipboard size to 0");
-  }
+  // No clipboard size limit: clipboard sharing is controlled only by the
+  // enable flag, never disabled based on a maximum size.
 
   m_screen->setOptions(options);
 }
@@ -332,14 +330,8 @@ void Client::sendClipboard(ClipboardID id)
   if (m_timeClipboard[id] == 0 || clipboard.getTime() != m_timeClipboard[id]) {
     // marshall the data
     std::string data = clipboard.marshall();
-    if (data.size() >= m_maximumClipboardSize * 1024) {
-      LOG(
-          (CLOG_NOTE "skipping clipboard transfer because the clipboard"
-                     " contents exceeds the %i MB size limit set by the server",
-           m_maximumClipboardSize / 1024)
-      );
-      return;
-    }
+    // No clipboard size limit: send clipboards of any size (the size check the
+    // server may request is intentionally not enforced).
 
     // save new time
     m_timeClipboard[id] = clipboard.getTime();
@@ -546,7 +538,8 @@ void Client::handleShapeChanged()
 
 void Client::handleClipboardGrabbed(const Event &event)
 {
-  if (!m_enableClipboard || (m_maximumClipboardSize == 0)) {
+  // No clipboard size limit: only the enable flag gates sharing.
+  if (!m_enableClipboard) {
     return;
   }
 

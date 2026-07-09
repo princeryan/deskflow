@@ -48,6 +48,8 @@ add_library(${target} STATIC
   config/ScreenList.h
   config/ServerConfig.cpp
   config/ServerConfig.h
+  core/AutoStart.cpp
+  core/AutoStart.h
   core/ClientConnection.cpp
   core/ClientConnection.h
   core/CoreProcess.cpp

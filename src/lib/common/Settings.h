@@ -70,11 +70,13 @@ public:
   {
     inline static const auto Autohide = QStringLiteral("gui/autoHide");
     inline static const auto AutoStartCore = QStringLiteral("gui/startCoreWithGui");
+    inline static const auto StartOnLogin = QStringLiteral("gui/startOnLogin");
     inline static const auto AutoUpdateCheck = QStringLiteral("gui/enableUpdateCheck");
     inline static const auto UpdateCheckUrl = QStringLiteral("gui/updateCheckUrl");
     inline static const auto CloseReminder = QStringLiteral("gui/closeReminder");
     inline static const auto CloseToTray = QStringLiteral("gui/closeToTray");
     inline static const auto LogExpanded = QStringLiteral("gui/logExpanded");
+    inline static const auto NotifyOnConnectionChange = QStringLiteral("gui/notifyOnConnectionChange");
     inline static const auto SymbolicTrayIcon = QStringLiteral("gui/symbolicTrayIcon");
     inline static const auto WindowGeometry = QStringLiteral("gui/windowGeometry");
     inline static const auto ShowGenericClientFailureDialog = QStringLiteral("gui/showGenericClientFailureDialog");
@@ -221,11 +223,13 @@ private:
     , Settings::Log::GuiDebug
     , Settings::Gui::Autohide
     , Settings::Gui::AutoStartCore
+    , Settings::Gui::StartOnLogin
     , Settings::Gui::AutoUpdateCheck
     , Settings::Gui::UpdateCheckUrl
     , Settings::Gui::CloseReminder
     , Settings::Gui::CloseToTray
     , Settings::Gui::LogExpanded
+    , Settings::Gui::NotifyOnConnectionChange
     , Settings::Gui::SymbolicTrayIcon
     , Settings::Gui::WindowGeometry
     , Settings::Gui::ShowGenericClientFailureDialog
@@ -244,6 +248,7 @@ private:
   inline static const QStringList m_defaultFalseValues = {
       Settings::Gui::Autohide
     , Settings::Gui::AutoStartCore
+    , Settings::Gui::StartOnLogin
     , Settings::Gui::ShownFirstConnectedMessage
     , Settings::Gui::ShownServerFirstStartMessage
     , Settings::Gui::ShowVersionInTitle
@@ -262,6 +267,7 @@ private:
     , Settings::Client::LanguageSync
     , Settings::Gui::CloseToTray
     , Settings::Gui::CloseReminder
+    , Settings::Gui::NotifyOnConnectionChange
     , Settings::Gui::LogExpanded
     , Settings::Gui::SymbolicTrayIcon
     , Settings::Gui::ShowGenericClientFailureDialog

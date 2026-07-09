@@ -46,6 +46,16 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
+           <widget class="QCheckBox" name="cbStartOnLogin">
+            <property name="toolTip">
+             <string>Launch Deskflow automatically when you log in.</string>
+            </property>
+            <property name="text">
+             <string>Start Deskflow on login</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="cbAutoUpdate">
             <property name="text">
              <string>Check for updates on startup</string>
@@ -77,6 +87,16 @@
            <widget class="QCheckBox" name="cbCloseToTray">
             <property name="text">
              <string>Leave app running in notification area when the window is closed</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbNotifyOnConnectionChange">
+            <property name="toolTip">
+             <string>Show a notification when the connection to the server is lost or restored.</string>
+            </property>
+            <property name="text">
+             <string>Notify when the connection is lost or restored</string>
             </property>
            </widget>
           </item>

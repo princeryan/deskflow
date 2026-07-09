@@ -460,10 +460,7 @@ void Server::switchScreen(BaseClientProxy *dst, int32_t x, int32_t y, bool forSc
     if (m_enableClipboard) {
       // send the clipboard data to new active screen
       for (ClipboardID id = 0; id < kClipboardEnd; ++id) {
-        // Hackity hackity hack
-        if (m_clipboards[id].m_clipboard.marshall().size() > (m_maximumClipboardSize * 1024)) {
-          continue;
-        }
+        // No clipboard size limit: share clipboards of any size.
         m_active->setClipboard(id, &m_clipboards[id].m_clipboard);
       }
     }
@@ -1153,7 +1150,7 @@ void Server::handleShapeChanged(BaseClientProxy *client)
 
 void Server::handleClipboardGrabbed(const Event &event, BaseClientProxy *grabber)
 {
-  if (!m_enableClipboard || (m_maximumClipboardSize == 0)) {
+  if (!m_enableClipboard) {
     return;
   }
 
@@ -1441,13 +1438,7 @@ void Server::onClipboardChanged(const BaseClientProxy *sender, ClipboardID id, u
   sender->getClipboard(id, &clipboard.m_clipboard);
 
   std::string data = clipboard.m_clipboard.marshall();
-  if (data.size() > m_maximumClipboardSize * 1024) {
-    LOG_NOTE(
-        "not updating clipboard because it's over the size limit (%i KB) configured by the server",
-        m_maximumClipboardSize
-    );
-    return;
-  }
+  // No clipboard size limit: accept clipboards of any size.
 
   // ignore if data hasn't changed
   if (data == clipboard.m_clipboardData) {

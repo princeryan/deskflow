@@ -1020,6 +1020,33 @@ void MainWindow::coreConnectionStateChanged(CoreConnectionState state)
   } else if (isVisible()) {
     showFirstConnectedMessage();
   }
+
+  notifyConnectionChange(state);
+  m_lastConnectionState = state;
+}
+
+void MainWindow::notifyConnectionChange(CoreConnectionState state)
+{
+  if (!m_trayIcon || !Settings::value(Settings::Gui::NotifyOnConnectionChange).toBool())
+    return;
+
+  // Only meaningful for a client tracking its link to the server.
+  if (m_coreProcess.mode() != Settings::CoreMode::Client)
+    return;
+
+  constexpr int kNotifyMs = 5000;
+
+  if (state == CoreConnectionState::Disconnected && m_lastConnectionState == CoreConnectionState::Connected) {
+    m_trayIcon->showMessage(
+        tr("Deskflow"), tr("Disconnected from the server."), QSystemTrayIcon::Warning, kNotifyMs
+    );
+    m_notifiedDisconnect = true;
+  } else if (state == CoreConnectionState::Connected && m_notifiedDisconnect) {
+    m_trayIcon->showMessage(
+        tr("Deskflow"), tr("Reconnected to the server."), QSystemTrayIcon::Information, kNotifyMs
+    );
+    m_notifiedDisconnect = false;
+  }
 }
 
 void MainWindow::updateLocalFingerprint()
