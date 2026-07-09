@@ -225,6 +225,17 @@ void MainWindow::buildAppShell()
   ui->btnConfigureServer->setIcon(QIcon());
   ui->btnSaveServerConfig->setIcon(QIcon());
 
+  // The name row and some buttons carry fixed heights from the .ui (28px row,
+  // 32px button) that clip the rounded pills. Clear those caps.
+  ui->widget->setMinimumHeight(0);
+  ui->widget->setMaximumHeight(QWIDGETSIZE_MAX);
+  for (auto *b : {ui->btnEditName, ui->btnConfigureClient, ui->btnConfigureServer, ui->btnSaveServerConfig,
+                  ui->btnToggleCore}) {
+    b->setMinimumHeight(0);
+    b->setMaximumHeight(QWIDGETSIZE_MAX);
+    b->setFixedHeight(34);
+  }
+
   // Present the two modes as a vertical choice list (one option per row) rather
   // than a cramped horizontal pair.
   if (auto *oldModeLayout = ui->widgetModeSelection->layout()) {

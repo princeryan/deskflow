@@ -218,14 +218,14 @@ QLabel[dim="true"] { color: %TEXTDIM%; }
 
 QPushButton {
   background: %CONTROL%; color: %TEXT%;
-  border: 1px solid %CONTROLBORDER%; border-radius: 15px;
-  padding: 2px 18px; min-height: 30px; font-weight: 600;
+  border: none; border-radius: 16px;
+  padding: 0 18px; min-height: 34px; font-weight: 600;
 }
 QPushButton:hover { background: %CONTROLHOVER%; }
 QPushButton:pressed { background: %CONTROLBORDER%; }
-QPushButton:disabled { background: %SURFACEALT%; color: %TEXTDIM%; border-color: %BORDER%; }
+QPushButton:disabled { background: %SURFACEALT%; color: %TEXTDIM%; }
 QPushButton:default, QPushButton[accent="true"] {
-  background: %ACCENT%; color: %ACCENTTEXT%; border: 1px solid %ACCENT%; font-weight: 600;
+  background: %ACCENT%; color: %ACCENTTEXT%; border: none; font-weight: 600;
 }
 QPushButton:default:hover, QPushButton[accent="true"]:hover { background: %ACCENTHOVER%; border-color: %ACCENTHOVER%; }
 
