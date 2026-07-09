@@ -218,8 +218,8 @@ QLabel[dim="true"] { color: %TEXTDIM%; }
 
 QPushButton {
   background: %CONTROL%; color: %TEXT%;
-  border: 1px solid %CONTROLBORDER%; border-radius: 19px;
-  padding: 0 22px; min-height: 38px; font-weight: 600;
+  border: 1px solid %CONTROLBORDER%; border-radius: 15px;
+  padding: 2px 18px; min-height: 30px; font-weight: 600;
 }
 QPushButton:hover { background: %CONTROLHOVER%; }
 QPushButton:pressed { background: %CONTROLBORDER%; }
@@ -232,7 +232,7 @@ QPushButton:default:hover, QPushButton[accent="true"]:hover { background: %ACCEN
 QLineEdit, QComboBox, QSpinBox, QAbstractSpinBox {
   background: %SURFACE%; color: %TEXT%;
   border: 1px solid %BORDERSTRONG%; border-radius: 8px;
-  padding: 0 12px; min-height: 36px;
+  padding: 0 12px; min-height: 32px;
   selection-background-color: %ACCENT%; selection-color: %ACCENTTEXT%;
 }
 QPlainTextEdit, QTextEdit {
