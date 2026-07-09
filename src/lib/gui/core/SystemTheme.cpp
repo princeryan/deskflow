@@ -7,7 +7,10 @@
 #include "gui/core/SystemTheme.h"
 
 #include <QApplication>
+#include <QDir>
+#include <QFile>
 #include <QPalette>
+#include <QStandardPaths>
 #include <QStyleHints>
 
 #ifdef Q_OS_LINUX
@@ -51,6 +54,30 @@ QString hex(const QColor &c)
 bool isLight(const QColor &c)
 {
   return (0.299 * c.redF() + 0.587 * c.greenF() + 0.114 * c.blueF()) > 0.6;
+}
+
+// Write a checkmark SVG (in the given colour) to the cache and return its path,
+// so checked checkboxes show a real tick rather than a solid fill. The colour
+// is in the filename so a light/dark switch doesn't hit Qt's image cache.
+QString checkIconPath(const QColor &color)
+{
+  const QString hexName = color.name(QColor::HexRgb).mid(1);
+  const QString dir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+  QDir().mkpath(dir);
+  const QString path = dir + QStringLiteral("/deskflow-check-%1.svg").arg(hexName);
+  if (!QFile::exists(path)) {
+    const QString svg =
+        QStringLiteral("<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>"
+                       "<path d='M3.5 8.5 l3 3 l6 -7.2' fill='none' stroke='%1' stroke-width='2.2' "
+                       "stroke-linecap='round' stroke-linejoin='round'/></svg>")
+            .arg(color.name(QColor::HexRgb));
+    QFile f(path);
+    if (f.open(QIODevice::WriteOnly)) {
+      f.write(svg.toUtf8());
+      f.close();
+    }
+  }
+  return path;
 }
 
 } // namespace
@@ -267,7 +294,12 @@ QRadioButton::indicator:checked {
 QCheckBox::indicator {
   border: 2px solid %BORDERSTRONG%; border-radius: 6px; background: %SURFACE%;
 }
-QCheckBox::indicator:checked { background: %ACCENT%; border-color: %ACCENT%; }
+QCheckBox::indicator:checked {
+  background: %ACCENT%; border-color: %ACCENT%; image: url(%CHECKICON%);
+}
+QCheckBox::indicator:disabled { border-color: %BORDER%; }
+
+QScrollArea#pageScroll { background: %BG%; border: 0; }
 
 QToolButton { background: transparent; border: 0; border-radius: 8px; padding: 6px; }
 QToolButton:hover { background: %HOVER%; }
@@ -305,6 +337,7 @@ QToolTip {
   qss.replace("%TEXTDIM%", p.textDim);
   qss.replace("%TEXT%", p.text);
   qss.replace("%HOVER%", p.hover);
+  qss.replace("%CHECKICON%", checkIconPath(QColor(p.accentText)));
   qss.replace("%CONTROLBORDER%", p.controlBorder);
   qss.replace("%CONTROLHOVER%", p.controlHover);
   qss.replace("%CONTROL%", p.control);

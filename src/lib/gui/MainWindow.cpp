@@ -51,6 +51,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScreen>
+#include <QScrollArea>
 #include <QScrollBar>
 
 #include <memory>
@@ -196,16 +197,24 @@ void MainWindow::buildAppShell()
     return card;
   };
 
+  // Each page scrolls, so content is never clipped at small window sizes.
   auto makePage = [](const QString &title) -> std::pair<QWidget *, QVBoxLayout *> {
-    auto *page = new QWidget;
-    page->setObjectName(QStringLiteral("page"));
-    auto *v = new QVBoxLayout(page);
+    auto *content = new QWidget;
+    content->setObjectName(QStringLiteral("page"));
+    auto *v = new QVBoxLayout(content);
     v->setContentsMargins(24, 24, 24, 24);
     v->setSpacing(20);
     auto *t = new QLabel(title);
     t->setObjectName(QStringLiteral("pageTitle"));
     v->addWidget(t);
-    return {page, v};
+
+    auto *scroll = new QScrollArea;
+    scroll->setObjectName(QStringLiteral("pageScroll"));
+    scroll->setWidget(content);
+    scroll->setWidgetResizable(true);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    return {scroll, v};
   };
 
   // Primary action gets the accent treatment.
@@ -269,7 +278,7 @@ void MainWindow::buildAppShell()
   optsCol->addWidget(ui->clientOptions);
   optsCol->addWidget(ui->horizontalWidget);
   ui->lineHostname->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-  ui->lineHostname->setMinimumWidth(220);
+  ui->lineHostname->setMinimumWidth(150);
 
   // --- Connection page: "this computer" + mode/connect cards ---
   auto [connPage, connLayout] = makePage(tr("Connection"));
@@ -282,6 +291,9 @@ void MainWindow::buildAppShell()
   QWidget *logInner = m_logDock ? m_logDock->widget() : nullptr;
   logLayout->addWidget(makeCard(logInner, QString()), 1);
   if (m_logDock) {
+    // The old dock's toggle re-applies setFixedSize() (locking the window to a
+    // small size); it's obsolete now the log is a page, so disconnect it.
+    disconnect(m_logDock->toggleViewAction(), nullptr, this, nullptr);
     removeDockWidget(m_logDock);
     m_logDock->hide();
   }
@@ -371,8 +383,19 @@ void MainWindow::buildAppShell()
   h->addWidget(sidebar);
   h->addWidget(m_contentStack, 1);
 
+  m_contentStack->setMinimumSize(560, 460);
   setCentralWidget(central);
+  // restoreWindow() may have called setFixedSize() (old log-dock behaviour);
+  // undo that so the window is freely resizable, and set a comfortable default
+  // size once shown (an immediate resize gets overridden on show).
+  setMinimumSize(720, 480);
+  setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   resize(940, 620);
+  QTimer::singleShot(0, this, [this] {
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    if (width() < 900 || height() < 600)
+      resize(940, 620);
+  });
 }
 
 MainWindow::~MainWindow()
