@@ -198,6 +198,7 @@ void MainWindow::buildAppShell()
 
   auto makePage = [](const QString &title) -> std::pair<QWidget *, QVBoxLayout *> {
     auto *page = new QWidget;
+    page->setObjectName(QStringLiteral("page"));
     auto *v = new QVBoxLayout(page);
     v->setContentsMargins(24, 24, 24, 24);
     v->setSpacing(20);

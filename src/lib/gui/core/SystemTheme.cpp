@@ -174,8 +174,10 @@ QString SystemTheme::buildStyleSheet() const
   outline: 0;
 }
 QMainWindow, QDialog { background: %BG%; }
-QWidget { background: transparent; }
-QWidget#shell { background: %BG%; }
+QWidget#shell, QStackedWidget, QWidget#page { background: %BG%; }
+/* card-internal containers show the card surface behind them */
+QWidget#widget, QWidget#widgetModeSelection, QWidget#widgetModeOptions,
+QWidget#serverOptions, QWidget#clientOptions, QWidget#horizontalWidget { background: transparent; }
 
 /* ---- Sidebar ---- */
 QWidget#sidebar { background: %BG%; border-right: 1px solid %BORDER%; }
