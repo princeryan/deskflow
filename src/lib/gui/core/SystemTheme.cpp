@@ -295,7 +295,7 @@ QCheckBox::indicator {
   border: 2px solid %BORDERSTRONG%; border-radius: 6px; background: %SURFACE%;
 }
 QCheckBox::indicator:checked {
-  background: %ACCENT%; border-color: %ACCENT%; image: url(%CHECKICON%);
+  background: %ACCENT%; border-color: %ACCENT%; image: url("%CHECKICON%");
 }
 QCheckBox::indicator:disabled { border-color: %BORDER%; }
 
