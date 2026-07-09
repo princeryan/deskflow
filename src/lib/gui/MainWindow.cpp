@@ -41,6 +41,7 @@
 #include <QLocalSocket>
 #include <QMenu>
 #include <QStackedWidget>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -180,8 +181,8 @@ void MainWindow::buildAppShell()
     auto *card = new QFrame;
     card->setObjectName(QStringLiteral("card"));
     auto *v = new QVBoxLayout(card);
-    v->setContentsMargins(20, 18, 20, 18);
-    v->setSpacing(12);
+    v->setContentsMargins(20, 20, 20, 20);
+    v->setSpacing(16);
     if (!caption.isEmpty()) {
       auto *cap = new QLabel(caption);
       cap->setObjectName(QStringLiteral("cardTitle"));
@@ -198,8 +199,8 @@ void MainWindow::buildAppShell()
   auto makePage = [](const QString &title) -> std::pair<QWidget *, QVBoxLayout *> {
     auto *page = new QWidget;
     auto *v = new QVBoxLayout(page);
-    v->setContentsMargins(32, 28, 32, 28);
-    v->setSpacing(18);
+    v->setContentsMargins(24, 24, 24, 24);
+    v->setSpacing(20);
     auto *t = new QLabel(title);
     t->setObjectName(QStringLiteral("pageTitle"));
     v->addWidget(t);
@@ -208,6 +209,38 @@ void MainWindow::buildAppShell()
 
   // Primary action gets the accent treatment.
   ui->btnToggleCore->setProperty("accent", true);
+
+  // Present the two modes as a vertical choice list (one option per row) rather
+  // than a cramped horizontal pair.
+  if (auto *oldModeLayout = ui->widgetModeSelection->layout()) {
+    oldModeLayout->removeWidget(ui->rbModeServer);
+    oldModeLayout->removeWidget(ui->rbModeClient);
+    delete oldModeLayout;
+  }
+  auto *modeCol = new QVBoxLayout(ui->widgetModeSelection);
+  modeCol->setContentsMargins(0, 0, 0, 0);
+  modeCol->setSpacing(6);
+  modeCol->addWidget(ui->rbModeServer);
+  modeCol->addWidget(ui->rbModeClient);
+
+  // Stack the mode options vertically (address on its own row, actions below)
+  // so nothing gets cramped, and let the address field fill its row.
+  if (auto *oldOpts = ui->widgetModeOptions->layout()) {
+    oldOpts->removeWidget(ui->serverOptions);
+    oldOpts->removeWidget(ui->lblNoMode);
+    oldOpts->removeWidget(ui->clientOptions);
+    oldOpts->removeWidget(ui->horizontalWidget);
+    delete oldOpts;
+  }
+  auto *optsCol = new QVBoxLayout(ui->widgetModeOptions);
+  optsCol->setContentsMargins(0, 0, 0, 0);
+  optsCol->setSpacing(12);
+  optsCol->addWidget(ui->serverOptions);
+  optsCol->addWidget(ui->lblNoMode);
+  optsCol->addWidget(ui->clientOptions);
+  optsCol->addWidget(ui->horizontalWidget);
+  ui->lineHostname->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  ui->lineHostname->setMinimumWidth(220);
 
   // --- Connection page: "this computer" + mode/connect cards ---
   auto [connPage, connLayout] = makePage(tr("Connection"));
@@ -264,14 +297,33 @@ void MainWindow::buildAppShell()
   auto *brand = new QLabel(QStringLiteral("Deskflow"));
   brand->setObjectName(QStringLiteral("brand"));
 
+  // App Center has no menu bar: move the menu actions into a sidebar button.
+  menuBar()->hide();
+  auto *menuButton = new QToolButton;
+  menuButton->setObjectName(QStringLiteral("menuButton"));
+  menuButton->setText(tr("Menu"));
+  menuButton->setIcon(QIcon::fromTheme(QStringLiteral("open-menu-symbolic")));
+  menuButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  menuButton->setPopupMode(QToolButton::InstantPopup);
+  menuButton->setCursor(Qt::PointingHandCursor);
+  auto *appMenu = new QMenu(menuButton);
+  appMenu->addAction(m_actionSettings);
+  appMenu->addSeparator();
+  appMenu->addAction(m_actionReportBug);
+  appMenu->addAction(m_actionClearSettings);
+  appMenu->addSeparator();
+  appMenu->addAction(m_actionQuit);
+  menuButton->setMenu(appMenu);
+
   auto *sidebar = new QWidget;
   sidebar->setObjectName(QStringLiteral("sidebar"));
   sidebar->setFixedWidth(228);
   auto *sv = new QVBoxLayout(sidebar);
-  sv->setContentsMargins(14, 20, 14, 14);
-  sv->setSpacing(14);
+  sv->setContentsMargins(12, 18, 12, 12);
+  sv->setSpacing(16);
   sv->addWidget(brand);
   sv->addWidget(m_nav, 1);
+  sv->addWidget(menuButton);
 
   auto *central = new QWidget;
   central->setObjectName(QStringLiteral("shell"));

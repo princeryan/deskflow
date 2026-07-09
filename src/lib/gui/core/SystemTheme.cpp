@@ -128,23 +128,25 @@ QString SystemTheme::buildStyleSheet() const
 
   Palette p;
   if (dark) {
-    p.bg = "#1e1e1f";
-    p.surface = "#2b2b2d";
-    p.surfaceAlt = "#242426";
-    p.border = "#3a3a3d";
-    p.borderStrong = "#4a4a4e";
-    p.text = "#f2f2f3";
-    p.textDim = "#9a9aa0";
-    p.hover = "rgba(255,255,255,0.06)";
+    // Yaru dark
+    p.bg = "#1e1e1e";
+    p.surface = "#303030";
+    p.surfaceAlt = "#282828";
+    p.border = "#3d3d3d";
+    p.borderStrong = "#4d4d4d";
+    p.text = "#ffffff";
+    p.textDim = "#b0b0b0";
+    p.hover = "rgba(255,255,255,0.07)";
   } else {
-    p.bg = "#f5f5f7";
+    // Yaru light
+    p.bg = "#f6f6f6";
     p.surface = "#ffffff";
-    p.surfaceAlt = "#fbfbfd";
-    p.border = "#e4e4e8";
-    p.borderStrong = "#d2d2d8";
-    p.text = "#1d1d1f";
-    p.textDim = "#6e6e73";
-    p.hover = "rgba(0,0,0,0.04)";
+    p.surfaceAlt = "#fafafa";
+    p.border = "#e6e6e6";
+    p.borderStrong = "#d0d0d0";
+    p.text = "#2c2c2c";
+    p.textDim = "#5c5c5c";
+    p.hover = "rgba(0,0,0,0.045)";
   }
   p.accent = hex(accent);
   p.accentText = isLight(accent) ? QStringLiteral("#1d1d1f") : QStringLiteral("#ffffff");
@@ -175,11 +177,17 @@ QListWidget#nav::item {
 }
 QListWidget#nav::item:hover { background: %HOVER%; color: %TEXT%; }
 QListWidget#nav::item:selected { background: %ACCENTSOFT%; color: %TEXT%; }
+QToolButton#menuButton {
+  background: transparent; color: %TEXTDIM%; border: 0; border-radius: 9px;
+  padding: 8px 12px; text-align: left;
+}
+QToolButton#menuButton:hover { background: %HOVER%; color: %TEXT%; }
+QToolButton#menuButton::menu-indicator { image: none; width: 0; }
 
 /* ---- Content ---- */
-QLabel#pageTitle { color: %TEXT%; font-size: 25px; font-weight: 700; }
-QLabel#cardTitle { color: %TEXTDIM%; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
-QFrame#card { background: %SURFACE%; border: 1px solid %BORDER%; border-radius: 14px; }
+QLabel#pageTitle { color: %TEXT%; font-size: 26px; font-weight: 700; }
+QLabel#cardTitle { color: %TEXT%; font-size: 15px; font-weight: 700; }
+QFrame#card { background: %SURFACE%; border: 1px solid %BORDER%; border-radius: 12px; }
 
 /* group boxes are now plain containers inside cards */
 QGroupBox { background: transparent; border: 0; margin: 0; padding: 0; }
@@ -201,7 +209,7 @@ QLabel[dim="true"] { color: %TEXTDIM%; }
 QPushButton {
   background: %SURFACE%; color: %TEXT%;
   border: 1px solid %BORDERSTRONG%; border-radius: 8px;
-  padding: 7px 16px; min-height: 18px;
+  padding: 0 18px; min-height: 36px;
 }
 QPushButton:hover { background: %HOVER%; }
 QPushButton:pressed { background: %BORDER%; }
@@ -211,10 +219,17 @@ QPushButton:default, QPushButton[accent="true"] {
 }
 QPushButton:default:hover, QPushButton[accent="true"]:hover { background: %ACCENTHOVER%; border-color: %ACCENTHOVER%; }
 
-QLineEdit, QPlainTextEdit, QTextEdit, QComboBox, QSpinBox, QAbstractSpinBox {
+QLineEdit, QComboBox, QSpinBox, QAbstractSpinBox {
   background: %SURFACE%; color: %TEXT%;
   border: 1px solid %BORDERSTRONG%; border-radius: 8px;
-  padding: 6px 10px; selection-background-color: %ACCENT%; selection-color: %ACCENTTEXT%;
+  padding: 0 12px; min-height: 36px;
+  selection-background-color: %ACCENT%; selection-color: %ACCENTTEXT%;
+}
+QPlainTextEdit, QTextEdit {
+  background: %SURFACEALT%; color: %TEXT%;
+  border: 1px solid %BORDER%; border-radius: 8px;
+  padding: 8px 10px; selection-background-color: %ACCENT%; selection-color: %ACCENTTEXT%;
+  font-family: "Ubuntu Mono", "SF Mono", "DejaVu Sans Mono", monospace;
 }
 QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus, QComboBox:focus, QAbstractSpinBox:focus {
   border: 1px solid %ACCENT%;
@@ -225,9 +240,7 @@ QComboBox QAbstractItemView {
   selection-background-color: %ACCENT%; selection-color: %ACCENTTEXT%; padding: 4px;
 }
 
-QPlainTextEdit, QTextEdit { background: %SURFACEALT%; font-family: "Ubuntu Mono", "SF Mono", monospace; }
-
-QRadioButton, QCheckBox { background: transparent; spacing: 9px; padding: 4px 0; }
+QRadioButton, QCheckBox { background: transparent; spacing: 10px; padding: 6px 0; }
 QRadioButton::indicator, QCheckBox::indicator { width: 18px; height: 18px; }
 QRadioButton::indicator {
   border: 2px solid %BORDERSTRONG%; border-radius: 9px; background: %SURFACE%;
