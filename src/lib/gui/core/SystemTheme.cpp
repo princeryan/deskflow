@@ -218,8 +218,8 @@ QLabel[dim="true"] { color: %TEXTDIM%; }
 
 QPushButton {
   background: %CONTROL%; color: %TEXT%;
-  border: 1px solid %CONTROLBORDER%; border-radius: 8px;
-  padding: 0 20px; min-height: 38px; font-weight: 600;
+  border: 1px solid %CONTROLBORDER%; border-radius: 19px;
+  padding: 0 22px; min-height: 38px; font-weight: 600;
 }
 QPushButton:hover { background: %CONTROLHOVER%; }
 QPushButton:pressed { background: %CONTROLBORDER%; }
