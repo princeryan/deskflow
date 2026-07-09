@@ -210,6 +210,18 @@ void MainWindow::buildAppShell()
   // Primary action gets the accent treatment.
   ui->btnToggleCore->setProperty("accent", true);
 
+  // These were flat / icon-only, so they read as icons rather than buttons.
+  // Make them plain, clearly-labelled buttons.
+  ui->btnEditName->setFlat(false);
+  ui->btnEditName->setIcon(QIcon());
+  ui->btnEditName->setText(tr("Rename"));
+  // Restart is redundant with Connect (which restarts the service); hide it.
+  ui->btnRestartCore->setVisible(false);
+  // No decorative icons on the other action buttons either.
+  ui->btnConfigureClient->setIcon(QIcon());
+  ui->btnConfigureServer->setIcon(QIcon());
+  ui->btnSaveServerConfig->setIcon(QIcon());
+
   // Present the two modes as a vertical choice list (one option per row) rather
   // than a cramped horizontal pair.
   if (auto *oldModeLayout = ui->widgetModeSelection->layout()) {
@@ -783,13 +795,8 @@ void MainWindow::updateModeControlLabels()
   m_actionStopCore->setText(stopText);
   m_actionStopCore->setIcon(stopIcon);
 
-  if (isStarted) {
-    ui->btnToggleCore->setText(stopText);
-    ui->btnToggleCore->setIcon(stopIcon);
-  } else {
-    ui->btnToggleCore->setText(startText);
-    ui->btnToggleCore->setIcon(startIcon);
-  }
+  // Text-only button (no decorative icon); the tray/menu actions keep icons.
+  ui->btnToggleCore->setText(isStarted ? stopText : startText);
 }
 
 void MainWindow::updateSecurityIcon(bool visible)
