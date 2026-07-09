@@ -114,6 +114,10 @@ private:
   void startProcessFromDaemon(const QStringList &args);
   void stopForegroundProcess() const;
   void stopProcessFromDaemon();
+  // Drive the headless login-screen client (deskflow-uinput.service) instead of
+  // launching our own core, so the GUI is a front-end for the running service.
+  void startExternalService();
+  void stopExternalService();
   QString persistServerConfig() const;
   void setConnectionState(ConnectionState state);
   void setProcessState(ProcessState state);
@@ -145,6 +149,11 @@ private:
   FileTail *m_daemonFileTail = nullptr;
   QProcess *m_process = nullptr;
   QString m_appPath;
+
+  // External-service mode (Linux headless login-screen client).
+  bool m_externalService = false;
+  QString m_serviceUnit;
+  QProcess *m_journalTail = nullptr;
 };
 
 } // namespace deskflow::gui

@@ -14,6 +14,7 @@
 #include "common/VersionInfo.h"
 #include "gui/Diagnostic.h"
 #include "gui/MainWindow.h"
+#include "gui/core/SystemTheme.h"
 #include "gui/Messages.h"
 #include "gui/StyleUtils.h"
 
@@ -148,6 +149,10 @@ int main(int argc, char *argv[])
   if (parser.isSet(resetOption)) {
     diagnostic::clearSettings(false);
   }
+
+  // Follow the desktop light/dark + accent, restyled for clarity.
+  auto *systemTheme = new deskflow::gui::SystemTheme(&app);
+  systemTheme->apply();
 
   MainWindow mainWindow;
   mainWindow.open();

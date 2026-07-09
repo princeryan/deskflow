@@ -52,6 +52,8 @@ add_library(${target} STATIC
   core/AutoStart.h
   core/ClientConnection.cpp
   core/ClientConnection.h
+  core/SystemTheme.cpp
+  core/SystemTheme.h
   core/CoreProcess.cpp
   core/CoreProcess.h
   core/NetworkMonitor.cpp
@@ -140,4 +142,8 @@ if(WIN32)
     arch
     net
   )
+endif()
+
+if(UNIX AND NOT APPLE)
+  target_link_libraries(${target} Qt6::DBus)
 endif()

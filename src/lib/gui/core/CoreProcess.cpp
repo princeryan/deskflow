@@ -97,7 +97,14 @@ CoreProcess::CoreProcess(const IServerConfig &serverConfig)
       m_daemonIpcClient{new ipc::DaemonIpcClient(this)}
 {
   m_appPath = QStringLiteral("%1/%2").arg(QCoreApplication::applicationDirPath(), kCoreBinName);
-  if (!QFile::exists(m_appPath)) {
+
+  // If the headless login-screen client service is installed, the GUI becomes a
+  // front-end for it (Start/Stop control the service, logs come from its
+  // journal) rather than launching its own core process.
+  m_serviceUnit = QStringLiteral("deskflow-uinput.service");
+  m_externalService = QFile::exists(QStringLiteral("/etc/systemd/system/") + m_serviceUnit);
+
+  if (!m_externalService && !QFile::exists(m_appPath)) {
     qFatal("core server binary does not exist");
     return;
   }
@@ -298,6 +305,11 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
     return;
   }
 
+  if (m_externalService) {
+    startExternalService();
+    return;
+  }
+
   QMutexLocker locker(&m_processMutex);
 
   const auto currentMode = Settings::value(Settings::Core::ProcessMode).value<ProcessMode>();
@@ -358,6 +370,11 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
 
 void CoreProcess::stop(std::optional<ProcessMode> processModeOption)
 {
+  if (m_externalService) {
+    stopExternalService();
+    return;
+  }
+
   QMutexLocker locker(&m_processMutex);
 
   const auto currentMode = Settings::value(Settings::Core::ProcessMode).value<ProcessMode>();
@@ -381,6 +398,55 @@ void CoreProcess::stop(std::optional<ProcessMode> processModeOption)
     qWarning("core process already stopped");
   }
 
+  setConnectionState(ConnectionState::Disconnected);
+}
+
+void CoreProcess::startExternalService()
+{
+  qInfo("starting login-screen client service: %s", qPrintable(m_serviceUnit));
+  setProcessState(ProcessState::Starting);
+  setConnectionState(ConnectionState::Connecting);
+
+  // Restart (not just start) so any settings the GUI just wrote are picked up.
+  // Authorised without a password by our polkit rule; non-blocking.
+  auto *ctl = new QProcess(this);
+  connect(ctl, &QProcess::finished, ctl, &QObject::deleteLater);
+  ctl->start(QStringLiteral("systemctl"), {QStringLiteral("restart"), m_serviceUnit});
+
+  // Stream the service journal into the same log/connection-state pipeline the
+  // foreground process would have fed.
+  if (!m_journalTail) {
+    m_journalTail = new QProcess(this);
+    connect(m_journalTail, &QProcess::readyReadStandardOutput, this, [this] {
+      handleLogLines(m_journalTail->readAllStandardOutput());
+    });
+  }
+  if (m_journalTail->state() == QProcess::NotRunning) {
+    m_journalTail->start(
+        QStringLiteral("journalctl"),
+        {QStringLiteral("-u"), m_serviceUnit, QStringLiteral("-f"), QStringLiteral("-n"), QStringLiteral("30"),
+         QStringLiteral("-o"), QStringLiteral("cat")}
+    );
+  }
+
+  setProcessState(ProcessState::Started);
+}
+
+void CoreProcess::stopExternalService()
+{
+  qInfo("stopping login-screen client service: %s", qPrintable(m_serviceUnit));
+  setProcessState(ProcessState::Stopping);
+
+  if (m_journalTail && m_journalTail->state() != QProcess::NotRunning) {
+    m_journalTail->kill();
+    m_journalTail->waitForFinished(1000);
+  }
+
+  auto *ctl = new QProcess(this);
+  connect(ctl, &QProcess::finished, ctl, &QObject::deleteLater);
+  ctl->start(QStringLiteral("systemctl"), {QStringLiteral("stop"), m_serviceUnit});
+
+  setProcessState(ProcessState::Stopped);
   setConnectionState(ConnectionState::Disconnected);
 }
 
