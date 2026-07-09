@@ -36,7 +36,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QListWidget>
+#include <QButtonGroup>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMenu>
@@ -278,21 +278,30 @@ void MainWindow::buildAppShell()
   m_contentStack->addWidget(logPage);
   m_contentStack->addWidget(aboutPage);
 
-  // --- Sidebar ---
-  m_nav = new QListWidget;
-  m_nav->setObjectName(QStringLiteral("nav"));
-  m_nav->setFrameShape(QFrame::NoFrame);
-  m_nav->setFocusPolicy(Qt::NoFocus);
-  m_nav->setIconSize(QSize(18, 18));
-  const auto addNav = [this](const QString &text, const QString &icon) {
-    auto *it = new QListWidgetItem(QIcon::fromTheme(icon), text, m_nav);
-    it->setSizeHint(QSize(0, 40));
+  // --- Sidebar navigation: exclusive checkable buttons (not a list) ---
+  auto *navWidget = new QWidget;
+  navWidget->setObjectName(QStringLiteral("nav"));
+  auto *navLayout = new QVBoxLayout(navWidget);
+  navLayout->setContentsMargins(0, 0, 0, 0);
+  navLayout->setSpacing(4);
+
+  m_nav = new QButtonGroup(this);
+  m_nav->setExclusive(true);
+  const auto addNav = [&](const QString &text, int index) {
+    auto *b = new QPushButton(text);
+    b->setObjectName(QStringLiteral("navItem"));
+    b->setCheckable(true);
+    b->setCursor(Qt::PointingHandCursor);
+    b->setFocusPolicy(Qt::NoFocus);
+    m_nav->addButton(b, index);
+    navLayout->addWidget(b);
   };
-  addNav(tr("Connection"), QStringLiteral("network-transmit-receive"));
-  addNav(tr("Activity"), QStringLiteral("view-list-symbolic"));
-  addNav(tr("About"), QStringLiteral("help-about"));
-  connect(m_nav, &QListWidget::currentRowChanged, m_contentStack, &QStackedWidget::setCurrentIndex);
-  m_nav->setCurrentRow(0);
+  addNav(tr("Connection"), 0);
+  addNav(tr("Activity"), 1);
+  addNav(tr("About"), 2);
+  navLayout->addStretch(1);
+  connect(m_nav, &QButtonGroup::idClicked, m_contentStack, &QStackedWidget::setCurrentIndex);
+  m_nav->button(0)->setChecked(true);
 
   auto *brand = new QLabel(QStringLiteral("Deskflow"));
   brand->setObjectName(QStringLiteral("brand"));
@@ -322,7 +331,7 @@ void MainWindow::buildAppShell()
   sv->setContentsMargins(12, 18, 12, 12);
   sv->setSpacing(16);
   sv->addWidget(brand);
-  sv->addWidget(m_nav, 1);
+  sv->addWidget(navWidget, 1);
   sv->addWidget(menuButton);
 
   auto *central = new QWidget;

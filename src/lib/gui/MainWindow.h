@@ -34,7 +34,7 @@
 class QAction;
 class QMenu;
 class QLabel;
-class QListWidget;
+class QButtonGroup;
 class QStackedWidget;
 class QLineEdit;
 class QGroupBox;
@@ -215,7 +215,7 @@ private:
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
 
   LogDock *m_logDock;
-  QListWidget *m_nav = nullptr;
+  QButtonGroup *m_nav = nullptr;
   QStackedWidget *m_contentStack = nullptr;
   QLabel *m_lblSecurityStatus = nullptr;
   QLabel *m_lblStatus = nullptr;

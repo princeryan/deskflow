@@ -171,12 +171,13 @@ QWidget#shell { background: %BG%; }
 /* ---- Sidebar ---- */
 QWidget#sidebar { background: %BG%; border-right: 1px solid %BORDER%; }
 QLabel#brand { color: %TEXT%; font-size: 19px; font-weight: 700; padding: 2px 10px 4px 10px; }
-QListWidget#nav { background: transparent; border: 0; }
-QListWidget#nav::item {
-  color: %TEXTDIM%; padding-left: 12px; border-radius: 9px; margin: 2px 2px;
+QWidget#nav { background: transparent; }
+QPushButton#navItem {
+  background: transparent; color: %TEXTDIM%; border: 0; border-radius: 9px;
+  padding: 9px 12px; text-align: left; min-height: 20px; font-weight: 500;
 }
-QListWidget#nav::item:hover { background: %HOVER%; color: %TEXT%; }
-QListWidget#nav::item:selected { background: %ACCENTSOFT%; color: %TEXT%; }
+QPushButton#navItem:hover { background: %HOVER%; color: %TEXT%; }
+QPushButton#navItem:checked { background: %ACCENTSOFT%; color: %TEXT%; font-weight: 700; }
 QToolButton#menuButton {
   background: transparent; color: %TEXTDIM%; border: 0; border-radius: 9px;
   padding: 8px 12px; text-align: left;
