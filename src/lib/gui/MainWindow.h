@@ -34,6 +34,8 @@
 class QAction;
 class QMenu;
 class QLabel;
+class QListWidget;
+class QStackedWidget;
 class QLineEdit;
 class QGroupBox;
 class QPushButton;
@@ -100,6 +102,11 @@ private:
    */
   void updateText();
   void toggleLogVisible(bool visible);
+
+  // Rebuilds the window as an App Center-style shell: a left sidebar of nav
+  // items and a content area of rounded cards. Re-parents the existing controls
+  // into pages so all wiring is preserved.
+  void buildAppShell();
 
   void settingsChanged(const QString &key = QString());
   void serverConfigSaving();
@@ -208,6 +215,8 @@ private:
   deskflow::gui::ipc::DaemonIpcClient *m_daemonIpcClient = nullptr;
 
   LogDock *m_logDock;
+  QListWidget *m_nav = nullptr;
+  QStackedWidget *m_contentStack = nullptr;
   QLabel *m_lblSecurityStatus = nullptr;
   QLabel *m_lblStatus = nullptr;
   QPushButton *m_btnFingerprint = nullptr;

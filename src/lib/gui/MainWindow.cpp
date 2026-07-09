@@ -33,9 +33,15 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMenu>
+#include <QStackedWidget>
+#include <QVBoxLayout>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -161,7 +167,124 @@ MainWindow::MainWindow()
       m_fingerprint = {QCryptographicHash::Sha256, TlsUtility::certFingerprint()};
     }
   }
+
+  // Reshape the window into the App Center-style sidebar + cards layout.
+  buildAppShell();
 }
+
+void MainWindow::buildAppShell()
+{
+  // A rounded "card" that hosts an existing control (re-parented, so its signal
+  // wiring is preserved), optionally under a small caption.
+  auto makeCard = [](QWidget *inner, const QString &caption) -> QFrame * {
+    auto *card = new QFrame;
+    card->setObjectName(QStringLiteral("card"));
+    auto *v = new QVBoxLayout(card);
+    v->setContentsMargins(20, 18, 20, 18);
+    v->setSpacing(12);
+    if (!caption.isEmpty()) {
+      auto *cap = new QLabel(caption);
+      cap->setObjectName(QStringLiteral("cardTitle"));
+      v->addWidget(cap);
+    }
+    if (inner) {
+      inner->setParent(card);
+      inner->setVisible(true);
+      v->addWidget(inner);
+    }
+    return card;
+  };
+
+  auto makePage = [](const QString &title) -> std::pair<QWidget *, QVBoxLayout *> {
+    auto *page = new QWidget;
+    auto *v = new QVBoxLayout(page);
+    v->setContentsMargins(32, 28, 32, 28);
+    v->setSpacing(18);
+    auto *t = new QLabel(title);
+    t->setObjectName(QStringLiteral("pageTitle"));
+    v->addWidget(t);
+    return {page, v};
+  };
+
+  // Primary action gets the accent treatment.
+  ui->btnToggleCore->setProperty("accent", true);
+
+  // --- Connection page: "this computer" + mode/connect cards ---
+  auto [connPage, connLayout] = makePage(tr("Connection"));
+  connLayout->addWidget(makeCard(ui->widget, tr("This computer")));
+  connLayout->addWidget(makeCard(ui->groupBox, tr("Connect to")));
+  connLayout->addStretch(1);
+
+  // --- Activity page: the log ---
+  auto [logPage, logLayout] = makePage(tr("Activity"));
+  QWidget *logInner = m_logDock ? m_logDock->widget() : nullptr;
+  logLayout->addWidget(makeCard(logInner, QString()), 1);
+  if (m_logDock) {
+    removeDockWidget(m_logDock);
+    m_logDock->hide();
+  }
+
+  // --- About page ---
+  auto [aboutPage, aboutLayout] = makePage(tr("About"));
+  auto *aboutCard = new QFrame;
+  aboutCard->setObjectName(QStringLiteral("card"));
+  auto *av = new QVBoxLayout(aboutCard);
+  av->setContentsMargins(20, 18, 20, 18);
+  av->setSpacing(6);
+  auto *appName = new QLabel(QStringLiteral("Deskflow"));
+  appName->setObjectName(QStringLiteral("cardTitle"));
+  auto *ver = new QLabel(tr("Version %1").arg(QApplication::applicationVersion()));
+  ver->setProperty("dim", true);
+  av->addWidget(appName);
+  av->addWidget(ver);
+  aboutLayout->addWidget(aboutCard);
+  aboutLayout->addStretch(1);
+
+  m_contentStack = new QStackedWidget;
+  m_contentStack->addWidget(connPage);
+  m_contentStack->addWidget(logPage);
+  m_contentStack->addWidget(aboutPage);
+
+  // --- Sidebar ---
+  m_nav = new QListWidget;
+  m_nav->setObjectName(QStringLiteral("nav"));
+  m_nav->setFrameShape(QFrame::NoFrame);
+  m_nav->setFocusPolicy(Qt::NoFocus);
+  m_nav->setIconSize(QSize(18, 18));
+  const auto addNav = [this](const QString &text, const QString &icon) {
+    auto *it = new QListWidgetItem(QIcon::fromTheme(icon), text, m_nav);
+    it->setSizeHint(QSize(0, 40));
+  };
+  addNav(tr("Connection"), QStringLiteral("network-transmit-receive"));
+  addNav(tr("Activity"), QStringLiteral("view-list-symbolic"));
+  addNav(tr("About"), QStringLiteral("help-about"));
+  connect(m_nav, &QListWidget::currentRowChanged, m_contentStack, &QStackedWidget::setCurrentIndex);
+  m_nav->setCurrentRow(0);
+
+  auto *brand = new QLabel(QStringLiteral("Deskflow"));
+  brand->setObjectName(QStringLiteral("brand"));
+
+  auto *sidebar = new QWidget;
+  sidebar->setObjectName(QStringLiteral("sidebar"));
+  sidebar->setFixedWidth(228);
+  auto *sv = new QVBoxLayout(sidebar);
+  sv->setContentsMargins(14, 20, 14, 14);
+  sv->setSpacing(14);
+  sv->addWidget(brand);
+  sv->addWidget(m_nav, 1);
+
+  auto *central = new QWidget;
+  central->setObjectName(QStringLiteral("shell"));
+  auto *h = new QHBoxLayout(central);
+  h->setContentsMargins(0, 0, 0, 0);
+  h->setSpacing(0);
+  h->addWidget(sidebar);
+  h->addWidget(m_contentStack, 1);
+
+  setCentralWidget(central);
+  resize(940, 620);
+}
+
 MainWindow::~MainWindow()
 {
   // Stop network monitoring

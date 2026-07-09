@@ -36,6 +36,7 @@ struct Palette
   QString accent;      // system accent
   QString accentText;  // text on the accent
   QString accentHover; // accent, slightly shifted for hover
+  QString accentSoft;  // accent at low alpha (selection wash)
 };
 
 QString hex(const QColor &c)
@@ -148,6 +149,11 @@ QString SystemTheme::buildStyleSheet() const
   p.accent = hex(accent);
   p.accentText = isLight(accent) ? QStringLiteral("#1d1d1f") : QStringLiteral("#ffffff");
   p.accentHover = hex(dark ? accent.lighter(115) : accent.darker(108));
+  p.accentSoft = QStringLiteral("rgba(%1,%2,%3,%4)")
+                     .arg(accent.red())
+                     .arg(accent.green())
+                     .arg(accent.blue())
+                     .arg(dark ? QStringLiteral("0.22") : QStringLiteral("0.14"));
 
   static const char *tpl = R"QSS(
 * {
@@ -156,10 +162,30 @@ QString SystemTheme::buildStyleSheet() const
   color: %TEXT%;
   outline: 0;
 }
-QMainWindow, QDialog, QWidget#centralWidget, QWidget {
-  background: %BG%;
+QMainWindow, QDialog { background: %BG%; }
+QWidget { background: transparent; }
+QWidget#shell { background: %BG%; }
+
+/* ---- Sidebar ---- */
+QWidget#sidebar { background: %BG%; border-right: 1px solid %BORDER%; }
+QLabel#brand { color: %TEXT%; font-size: 19px; font-weight: 700; padding: 2px 10px 4px 10px; }
+QListWidget#nav { background: transparent; border: 0; }
+QListWidget#nav::item {
+  color: %TEXTDIM%; padding-left: 12px; border-radius: 9px; margin: 2px 2px;
 }
-QMenuBar { background: transparent; padding: 4px 6px; }
+QListWidget#nav::item:hover { background: %HOVER%; color: %TEXT%; }
+QListWidget#nav::item:selected { background: %ACCENTSOFT%; color: %TEXT%; }
+
+/* ---- Content ---- */
+QLabel#pageTitle { color: %TEXT%; font-size: 25px; font-weight: 700; }
+QLabel#cardTitle { color: %TEXTDIM%; font-size: 12px; font-weight: 700; letter-spacing: 0.4px; }
+QFrame#card { background: %SURFACE%; border: 1px solid %BORDER%; border-radius: 14px; }
+
+/* group boxes are now plain containers inside cards */
+QGroupBox { background: transparent; border: 0; margin: 0; padding: 0; }
+QGroupBox::title { subcontrol-origin: margin; color: %TEXTDIM%; }
+
+QMenuBar { background: %BG%; padding: 4px 6px; }
 QMenuBar::item { background: transparent; padding: 5px 12px; border-radius: 7px; }
 QMenuBar::item:selected { background: %HOVER%; }
 QMenu {
@@ -168,18 +194,6 @@ QMenu {
 QMenu::item { padding: 7px 26px 7px 22px; border-radius: 6px; }
 QMenu::item:selected { background: %ACCENT%; color: %ACCENTTEXT%; }
 QMenu::separator { height: 1px; background: %BORDER%; margin: 5px 8px; }
-
-QGroupBox, QFrame#card {
-  background: %SURFACE%;
-  border: 1px solid %BORDER%;
-  border-radius: 12px;
-  margin-top: 10px;
-  padding: 16px 14px 14px 14px;
-}
-QGroupBox::title {
-  subcontrol-origin: margin; subcontrol-position: top left; left: 14px; padding: 0 4px;
-  color: %TEXTDIM%; font-size: 12px; font-weight: 600; text-transform: uppercase;
-}
 
 QLabel { background: transparent; color: %TEXT%; }
 QLabel[dim="true"] { color: %TEXTDIM%; }
@@ -213,13 +227,17 @@ QComboBox QAbstractItemView {
 
 QPlainTextEdit, QTextEdit { background: %SURFACEALT%; font-family: "Ubuntu Mono", "SF Mono", monospace; }
 
-QRadioButton, QCheckBox { background: transparent; spacing: 8px; padding: 3px 0; }
+QRadioButton, QCheckBox { background: transparent; spacing: 9px; padding: 4px 0; }
 QRadioButton::indicator, QCheckBox::indicator { width: 18px; height: 18px; }
 QRadioButton::indicator {
-  border: 2px solid %BORDERSTRONG%; border-radius: 10px; background: %SURFACE%;
+  border: 2px solid %BORDERSTRONG%; border-radius: 9px; background: %SURFACE%;
 }
+QRadioButton::indicator:hover { border-color: %ACCENT%; }
 QRadioButton::indicator:checked {
-  border: 5px solid %ACCENT%; border-radius: 10px; background: %SURFACE%;
+  border: 2px solid %ACCENT%;
+  border-radius: 9px;
+  background: qradialgradient(cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5,
+              stop:0 %ACCENT%, stop:0.42 %ACCENT%, stop:0.5 %SURFACE%, stop:1 %SURFACE%);
 }
 QCheckBox::indicator {
   border: 2px solid %BORDERSTRONG%; border-radius: 6px; background: %SURFACE%;
@@ -262,6 +280,7 @@ QToolTip {
   qss.replace("%TEXTDIM%", p.textDim);
   qss.replace("%TEXT%", p.text);
   qss.replace("%HOVER%", p.hover);
+  qss.replace("%ACCENTSOFT%", p.accentSoft);
   qss.replace("%ACCENTHOVER%", p.accentHover);
   qss.replace("%ACCENTTEXT%", p.accentText);
   qss.replace("%ACCENT%", p.accent);
