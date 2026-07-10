@@ -170,8 +170,10 @@ MainWindow::MainWindow()
     }
   }
 
-  // Reshape the window into the App Center-style sidebar + cards layout.
+  // Reshape the window into the App Center-style sidebar + cards layout (Linux only).
+#if defined(Q_OS_LINUX)
   buildAppShell();
+#endif
 }
 
 void MainWindow::buildAppShell()

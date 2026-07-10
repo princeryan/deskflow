@@ -10,10 +10,17 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <shlobj.h>
 #include <string>
 #include <vector>
+
+// Windows headers must be included in dependency order: windows.h first,
+// then shellapi.h (HDROP, DragQueryFileW/DragFinish) and shlobj.h (DROPFILES).
 #include <windows.h>
+
+#include <shellapi.h>
+#include <shlobj.h>
+
+#pragma comment(lib, "shell32.lib") // DragQueryFileW / DragFinish
 
 namespace {
 
