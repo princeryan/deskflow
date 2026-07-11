@@ -1,0 +1,128 @@
+# On-demand installer build for this fork.
+#
+# The main continuous-integration.yml only publishes installers on `master`
+# and `v*` tags. This workflow lets you build the three primary installers --
+# Windows (.msi), macOS (.dmg) and Linux (.deb) -- for any branch, on demand
+# from the Actions tab (workflow_dispatch), or automatically for a `v*` tag.
+# The resulting artifacts are attached to the run and, when a tag or an opt-in
+# dispatch is used, published as a GitHub prerelease.
+
+name: Release Installers
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the built installers as a GitHub prerelease"
+        type: boolean
+        default: false
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_CONFIGURE: "cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_BUILD_TESTS=ON"
+
+jobs:
+  build:
+    name: ${{ matrix.target.name }}
+    runs-on: ${{ matrix.target.runs-on }}
+    container: ${{ matrix.target.container }}
+    timeout-minutes: ${{ matrix.target.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - name: "windows-x64"
+            runs-on: "windows-2022"
+            timeout: 40
+            config-args: "-G Ninja"
+            vcpkg-triplet: x64-windows-release
+            arch: "amd64"
+            qt-version: 6.10.1
+
+          - name: "macos-arm64"
+            runs-on: macos-15
+            timeout: 20
+            qt-version: 6.10.1
+            config-args: '-DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=14 -DCMAKE_OSX_SYSROOT=/Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
+
+          - name: "linux-deb-x86_64"
+            runs-on: ubuntu-latest
+            container: debian:stable-slim
+            like: "debian"
+            timeout: 30
+            config-args: "-G Ninja -DCMAKE_INSTALL_PREFIX=/usr"
+
+    steps:
+      - name: Install Git on Container
+        if: ${{ matrix.target.container }}
+        shell: bash
+        run: apt update -qqq > /dev/null && apt install -qqq git devscripts > /dev/null
+
+      - name: Fancy Checkout
+        uses: sithlord48/fancy-checkout@v2
+
+      - name: Setup VC++ environment
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.target.arch }}
+
+      - name: Install dependencies
+        id: get-deps
+        uses: ./.github/actions/install-dependencies
+        with:
+          qt-version: ${{ matrix.target.qt-version }}
+          vcpkg-triplet: ${{ matrix.target.vcpkg-triplet }}
+          like: ${{ matrix.target.like }}
+
+      - name: Get version
+        uses: ./.github/actions/get-version
+
+      - name: Configure
+        run: ${{ env.CMAKE_CONFIGURE }} ${{ matrix.target.config-args }} ${{ steps.get-deps.outputs.vcpkg-cmake-config }} -DPACKAGE_VERSION_LABEL="${{ env.DESKFLOW_PACKAGE_VERSION }}"
+
+      - name: Build installer
+        shell: bash
+        run: cmake --build build --config Release -j8 --target package
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.target.name }}
+          path: ${{ github.workspace }}/build/deskflow[-_]*.*
+          if-no-files-found: error
+
+  publish:
+    name: Publish prerelease
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.ref, 'tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+    permissions:
+      contents: write
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          merge-multiple: true
+          path: dist
+
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum deskflow-* > sums.txt
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('installers-{0}', github.run_number) }}
+          prerelease: true
+          name: "Installers (${{ github.ref_name }})"
+          files: |
+            dist/deskflow-*
+            dist/sums.txt

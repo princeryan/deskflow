@@ -26,6 +26,60 @@ install(
   DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo/
 )
 
+# Login-screen (uinput) client integration: systemd units, udev + polkit rules.
+# This is what lets the client inject input at the GDM greeter / lock screen.
+# Bundled in the Linux packages so the feature is available out of the box; the
+# user still opts in per-account (see README) by joining the "input" group and
+# enabling deskflow-uinput@<user>.service.
+option(ENABLE_UINPUT_LOGINSCREEN "Package the login-screen (uinput) integration" ON)
+if(ENABLE_UINPUT_LOGINSCREEN)
+  # Resolve the systemd unit directories (fall back to the usual paths when the
+  # systemd pkg-config file is unavailable, e.g. minimal build containers).
+  find_package(PkgConfig QUIET)
+  if(PkgConfig_FOUND)
+    pkg_get_variable(SYSTEMD_SYSTEM_UNIT_DIR systemd systemdsystemunitdir)
+    pkg_get_variable(SYSTEMD_USER_UNIT_DIR systemd systemduserunitdir)
+  endif()
+  if(NOT SYSTEMD_SYSTEM_UNIT_DIR)
+    set(SYSTEMD_SYSTEM_UNIT_DIR ${CMAKE_INSTALL_PREFIX}/lib/systemd/system)
+  endif()
+  if(NOT SYSTEMD_USER_UNIT_DIR)
+    set(SYSTEMD_USER_UNIT_DIR ${CMAKE_INSTALL_PREFIX}/lib/systemd/user)
+  endif()
+
+  # System service (per-user template) -- points ExecStart at the installed core
+  configure_file(
+    ${MY_DIR}/systemd/deskflow-uinput@.service.in
+    ${CMAKE_BINARY_DIR}/deskflow-uinput@.service @ONLY
+  )
+  install(
+    FILES ${CMAKE_BINARY_DIR}/deskflow-uinput@.service
+    DESTINATION ${SYSTEMD_SYSTEM_UNIT_DIR}
+  )
+
+  # Session clipboard helper (user service)
+  configure_file(
+    ${MY_DIR}/systemd/deskflow-clipboard.service.in
+    ${CMAKE_BINARY_DIR}/deskflow-clipboard.service @ONLY
+  )
+  install(
+    FILES ${CMAKE_BINARY_DIR}/deskflow-clipboard.service
+    DESTINATION ${SYSTEMD_USER_UNIT_DIR}
+  )
+
+  # udev rule: grant /dev/uinput to group "input"
+  install(
+    FILES ${MY_DIR}/udev/99-deskflow-uinput.rules
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/udev/rules.d
+  )
+
+  # polkit rule: let an active local session manage the service password-less
+  install(
+    FILES ${MY_DIR}/polkit/49-deskflow-uinput.rules
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/polkit-1/rules.d
+  )
+endif()
+
 # Prepare PKGBUILD for Arch Linux
 configure_file(
   ${MY_DIR}/arch/PKGBUILD.in

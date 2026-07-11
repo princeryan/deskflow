@@ -10,6 +10,74 @@ and work seamlessly between them.
 It's like a software KVM (but without the video).
 TLS encryption is enabled by default. Wayland is supported. Clipboard sharing is supported.
 
+## What's new in this fork
+
+This fork adds login-screen input control, a native clipboard bridge, cross-platform file copy/paste, and a reworked GUI on top of upstream Deskflow.
+
+### Login-screen client (Linux, `uinput`)
+
+- A new headless client backend injects keyboard and mouse through the kernel's `/dev/uinput` device instead of a display server, so it keeps working at the **GNOME greeter and lock screen** — including under Wayland — with **no root**.
+- Opt in with `DESKFLOW_UINPUT=1`; when set it overrides the Wayland (libei) and X11 backends. It ships as a per-user systemd service (`deskflow-uinput@<user>.service`) that starts before the greeter.
+- Your user must be in the `input` group; a bundled udev rule grants that group access to `/dev/uinput`, and a polkit rule lets the GUI start/stop the service without a password prompt.
+- Optional tuning via `DESKFLOW_UINPUT_RESOLUTION` (`WxH`), `DESKFLOW_UINPUT_LAYOUT`, and `DESKFLOW_UINPUT_VARIANT` (XKB keyboard layout for the virtual keyboard; falls back to the system `XKBLAYOUT`/`XKBVARIANT`).
+
+### Native session clipboard bridge
+
+- A new `deskflow-clipboard` helper runs inside your desktop session and bridges the clipboard for the headless login-screen client over a Unix socket (`$XDG_RUNTIME_DIR/deskflow-clipboard.sock`).
+- It reads/writes the clipboard via Xwayland (`xclip`) rather than the Wayland selection, which avoids the focus-stealing and screen flicker that background Wayland clipboard access causes on GNOME. Carries text, HTML, and bitmaps.
+
+### File copy/paste between machines (Windows & Linux)
+
+- A new `File` clipboard format lets you **copy real files on one computer and paste them on another**. Peers that don't understand the format simply ignore it.
+- On Windows, an Explorer bridge reads the copied files' bytes into the payload and writes pasted files back out as real files; the wire format matches the Linux helper, so transfers are cross-platform.
+
+### Reworked GUI front-end
+
+- **Start on login** toggle (creates an autostart entry on Linux/Windows/macOS) and a **notify on connection change** toggle in Settings.
+- Follows the desktop's **light/dark theme and accent colour** live (via the freedesktop appearance portal), rendered in an App Center-style sidebar/cards layout.
+- Can act as a front-end for the login-screen service (start/stop/status) instead of launching its own core process.
+
+## Installing the fork builds
+
+Installers for this fork are produced by the **Release Installers** workflow (GitHub → Actions → *Release Installers* → *Run workflow*, or push a `v*` tag) and attached to the [Releases](https://github.com/princeryan/deskflow/releases) page: a Windows `.msi`, a macOS `.dmg`, and a Linux `.deb`.
+
+### Linux (Debian/Ubuntu `.deb`)
+
+```sh
+sudo apt install ./deskflow-*-x86_64.deb
+```
+
+To enable login-screen control (optional):
+
+```sh
+# 1. one-time: allow your user to inject input (log out and back in afterwards)
+sudo usermod -aG input $USER
+# 2. start the login-screen client for your account
+sudo systemctl enable --now deskflow-uinput@$USER.service
+# 3. start the session clipboard bridge (needed for clipboard at the desktop)
+systemctl --user enable --now deskflow-clipboard.service
+```
+
+The udev and polkit rules are installed by the package. Configure the server address and screen name once in the GUI (or `~/.config/Deskflow`) before enabling the service.
+
+### Windows (`.msi`)
+
+Double-click the installer, or from an elevated prompt:
+
+```bat
+msiexec /i Deskflow-<version>-win-x64.msi
+```
+
+You will also need the [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe).
+
+### macOS (`.dmg`)
+
+Open the `.dmg`, drag **Deskflow** to Applications, then clear the quarantine flag (the app is unsigned):
+
+```sh
+xattr -c /Applications/Deskflow.app
+```
+
 > [!TIP]
 >
 > **Chat with us**
