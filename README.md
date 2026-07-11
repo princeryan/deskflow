@@ -10,6 +10,13 @@ and work seamlessly between them.
 It's like a software KVM (but without the video).
 TLS encryption is enabled by default. Wayland is supported. Clipboard sharing is supported.
 
+> [!IMPORTANT]
+> **This is a fork of [deskflow/deskflow](https://github.com/deskflow/deskflow)** maintained by [princeryan](https://github.com/princeryan).
+> On top of upstream it adds a **login-screen (uinput) client** (works at the GNOME greeter/lock screen), a **native clipboard bridge**, **cross-machine file copy/paste**, and a **theme-following GUI**.
+> → [**What's new in this fork**](#whats-new-in-this-fork) · [**Install the fork builds**](#installing-the-fork-builds)
+>
+> Sections below the fork notes are inherited from the upstream project and describe upstream behaviour unless stated otherwise.
+
 ## What's new in this fork
 
 This fork adds login-screen input control, a native clipboard bridge, cross-platform file copy/paste, and a reworked GUI on top of upstream Deskflow.
@@ -39,7 +46,15 @@ This fork adds login-screen input control, a native clipboard bridge, cross-plat
 
 ## Installing the fork builds
 
-Installers for this fork are produced by the **Release Installers** workflow (GitHub → Actions → *Release Installers* → *Run workflow*, or push a `v*` tag) and attached to the [Releases](https://github.com/princeryan/deskflow/releases) page: a Windows `.msi`, a macOS `.dmg`, and a Linux `.deb`.
+Download the latest fork installers from the [**`fork-continuous` release**](https://github.com/princeryan/deskflow/releases/tag/fork-continuous) (also linked from [Releases → latest](https://github.com/princeryan/deskflow/releases/latest)):
+
+| OS | Installer |
+|----|-----------|
+| **Windows x64** | [`deskflow-continuous-win-x64.msi`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64.msi) &nbsp;·&nbsp; [portable `.7z`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64-portable.7z) |
+| **macOS (Apple Silicon)** | [`deskflow-continuous-macos-arm64.dmg`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-macos-arm64.dmg) |
+| **Linux (Debian/Ubuntu x86_64)** | [`deskflow-continuous-debian-trixie-x86_64.deb`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-debian-trixie-x86_64.deb) |
+
+These are unsigned continuous builds. Newer installers are produced by the **Release Installers** workflow (GitHub → Actions → *Release Installers* → *Run workflow*); enable its *publish* input, or push a `v*` tag, to attach a fresh set to a release.
 
 ### Linux (Debian/Ubuntu `.deb`)
 
@@ -65,7 +80,7 @@ The udev and polkit rules are installed by the package. Configure the server add
 Double-click the installer, or from an elevated prompt:
 
 ```bat
-msiexec /i Deskflow-<version>-win-x64.msi
+msiexec /i deskflow-continuous-win-x64.msi
 ```
 
 You will also need the [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe).
@@ -86,7 +101,10 @@ xattr -c /Applications/Deskflow.app
 > - Discussion also happens on IRC: `#deskflow` or `#deskflow-dev` on [Libera Chat](https://libera.chat/)
 > - Start a [new discussion](https://github.com/deskflow/deskflow/discussions) on our GitHub project.
 
-## Download
+## Download (upstream)
+
+> [!NOTE]
+> The badges and links in this section are for the **upstream [deskflow/deskflow](https://github.com/deskflow/deskflow)** project and **do not include this fork's features** (login-screen client, clipboard bridge, file transfer, reworked GUI). To install the fork, use [Installing the fork builds](#installing-the-fork-builds) above.
 
 [![Downloads: Stable Release](https://img.shields.io/github/downloads/deskflow/deskflow/latest/total?style=for-the-badge&logo=github&label=Download%20Stable)](https://github.com/deskflow/deskflow/releases/latest)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Downloads: Continuous Build](https://img.shields.io/github/downloads/deskflow/deskflow/continuous/total?style=for-the-badge&logo=github&label=Download%20Continuous)](https://github.com/deskflow/deskflow/releases/continuous)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Download From Flathub](https://img.shields.io/flathub/downloads/org.deskflow.deskflow?style=for-the-badge&logo=flathub&label=Download%20from%20flathub)](https://flathub.org/apps/org.deskflow.deskflow)
 
