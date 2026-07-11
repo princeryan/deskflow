@@ -10,88 +10,46 @@ and work seamlessly between them.
 It's like a software KVM (but without the video).
 TLS encryption is enabled by default. Wayland is supported. Clipboard sharing is supported.
 
-> [!IMPORTANT]
-> **This is a fork of [deskflow/deskflow](https://github.com/deskflow/deskflow)** maintained by [princeryan](https://github.com/princeryan).
-> On top of upstream it adds a **login-screen (uinput) client** (works at the GNOME greeter/lock screen), a **native clipboard bridge**, **cross-machine file copy/paste**, and a **theme-following GUI**.
-> → [**What's new in this fork**](#whats-new-in-this-fork) · [**Install the fork builds**](#installing-the-fork-builds)
->
-> Sections below the fork notes are inherited from the upstream project and describe upstream behaviour unless stated otherwise.
+> [!NOTE]
+> This is a fork of [Deskflow](https://github.com/deskflow/deskflow) with a few extra features. [**Jump to the download →**](#download-this-fork)
 
-## What's new in this fork
+## What's in this fork
 
-This fork adds login-screen input control, a native clipboard bridge, cross-platform file copy/paste, and a reworked GUI on top of upstream Deskflow.
+On top of Deskflow, this version adds:
 
-### Login-screen client (Linux, `uinput`)
+- **Control the login and lock screen too** — move between computers before you've signed in, not just after (Linux).
+- **Copy and paste files between computers**, not just text and pictures (Windows and Linux).
+- **A fresher look** that matches your system's light or dark theme, and can start automatically when you log in.
 
-- A new headless client backend injects keyboard and mouse through the kernel's `/dev/uinput` device instead of a display server, so it keeps working at the **GNOME greeter and lock screen** — including under Wayland — with **no root**.
-- Opt in with `DESKFLOW_UINPUT=1`; when set it overrides the Wayland (libei) and X11 backends. It ships as a per-user systemd service (`deskflow-uinput@<user>.service`) that starts before the greeter.
-- Your user must be in the `input` group; a bundled udev rule grants that group access to `/dev/uinput`, and a polkit rule lets the GUI start/stop the service without a password prompt.
-- Optional tuning via `DESKFLOW_UINPUT_RESOLUTION` (`WxH`), `DESKFLOW_UINPUT_LAYOUT`, and `DESKFLOW_UINPUT_VARIANT` (XKB keyboard layout for the virtual keyboard; falls back to the system `XKBLAYOUT`/`XKBVARIANT`).
+## Download this fork
 
-### Native session clipboard bridge
+Pick your computer:
 
-- A new `deskflow-clipboard` helper runs inside your desktop session and bridges the clipboard for the headless login-screen client over a Unix socket (`$XDG_RUNTIME_DIR/deskflow-clipboard.sock`).
-- It reads/writes the clipboard via Xwayland (`xclip`) rather than the Wayland selection, which avoids the focus-stealing and screen flicker that background Wayland clipboard access causes on GNOME. Carries text, HTML, and bitmaps.
+| Your computer | Download |
+|----|----|
+| **Windows** | [Download for Windows](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64.msi) |
+| **Mac** (Apple Silicon) | [Download for Mac](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-macos-arm64.dmg) |
+| **Linux** (Debian/Ubuntu) | [Download for Linux](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-debian-trixie-x86_64.deb) |
 
-### File copy/paste between machines (Windows & Linux)
+All files are also on the [downloads page](https://github.com/princeryan/deskflow/releases/tag/fork-continuous).
 
-- A new `File` clipboard format lets you **copy real files on one computer and paste them on another**. Peers that don't understand the format simply ignore it.
-- On Windows, an Explorer bridge reads the copied files' bytes into the payload and writes pasted files back out as real files; the wire format matches the Linux helper, so transfers are cross-platform.
+### Installing
 
-### Reworked GUI front-end
+- **Windows** — open the downloaded file and follow the prompts. If the app won't start, install the free [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe) and try again.
+- **Mac** — open the downloaded file and drag **Deskflow** into Applications. The first time, right-click the app and choose **Open** (it isn't signed by Apple, so a normal double-click is blocked).
+- **Linux** — open the downloaded file with your software installer, or run `sudo apt install ./deskflow-*-x86_64.deb` in a terminal.
 
-- **Start on login** toggle (creates an autostart entry on Linux/Windows/macOS) and a **notify on connection change** toggle in Settings.
-- Follows the desktop's **light/dark theme and accent colour** live (via the freedesktop appearance portal), rendered in an App Center-style sidebar/cards layout.
-- Can act as a front-end for the login-screen service (start/stop/status) instead of launching its own core process.
+### Using it at the login screen (Linux only)
 
-## Installing the fork builds
-
-Download the latest fork installers from the [**`fork-continuous` release**](https://github.com/princeryan/deskflow/releases/tag/fork-continuous) (also linked from [Releases → latest](https://github.com/princeryan/deskflow/releases/latest)):
-
-| OS | Installer |
-|----|-----------|
-| **Windows x64** | [`deskflow-continuous-win-x64.msi`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64.msi) &nbsp;·&nbsp; [portable `.7z`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64-portable.7z) |
-| **macOS (Apple Silicon)** | [`deskflow-continuous-macos-arm64.dmg`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-macos-arm64.dmg) |
-| **Linux (Debian/Ubuntu x86_64)** | [`deskflow-continuous-debian-trixie-x86_64.deb`](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-debian-trixie-x86_64.deb) |
-
-These are unsigned continuous builds. Newer installers are produced by the **Release Installers** workflow (GitHub → Actions → *Release Installers* → *Run workflow*); enable its *publish* input, or push a `v*` tag, to attach a fresh set to a release.
-
-### Linux (Debian/Ubuntu `.deb`)
+This extra feature needs a quick one-time setup. Open a terminal and run:
 
 ```sh
-sudo apt install ./deskflow-*-x86_64.deb
-```
-
-To enable login-screen control (optional):
-
-```sh
-# 1. one-time: allow your user to inject input (log out and back in afterwards)
 sudo usermod -aG input $USER
-# 2. start the login-screen client for your account
 sudo systemctl enable --now deskflow-uinput@$USER.service
-# 3. start the session clipboard bridge (needed for clipboard at the desktop)
 systemctl --user enable --now deskflow-clipboard.service
 ```
 
-The udev and polkit rules are installed by the package. Configure the server address and screen name once in the GUI (or `~/.config/Deskflow`) before enabling the service.
-
-### Windows (`.msi`)
-
-Double-click the installer, or from an elevated prompt:
-
-```bat
-msiexec /i deskflow-continuous-win-x64.msi
-```
-
-You will also need the [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe).
-
-### macOS (`.dmg`)
-
-Open the `.dmg`, drag **Deskflow** to Applications, then clear the quarantine flag (the app is unsigned):
-
-```sh
-xattr -c /Applications/Deskflow.app
-```
+Then log out and back in once. Set the other computer's address and a screen name in the app first.
 
 > [!TIP]
 >
@@ -101,10 +59,10 @@ xattr -c /Applications/Deskflow.app
 > - Discussion also happens on IRC: `#deskflow` or `#deskflow-dev` on [Libera Chat](https://libera.chat/)
 > - Start a [new discussion](https://github.com/deskflow/deskflow/discussions) on our GitHub project.
 
-## Download (upstream)
+## Download (original Deskflow)
 
 > [!NOTE]
-> The badges and links in this section are for the **upstream [deskflow/deskflow](https://github.com/deskflow/deskflow)** project and **do not include this fork's features** (login-screen client, clipboard bridge, file transfer, reworked GUI). To install the fork, use [Installing the fork builds](#installing-the-fork-builds) above.
+> The links below are for the **original Deskflow** and don't include this fork's extra features. For this fork, see [Download this fork](#download-this-fork) above.
 
 [![Downloads: Stable Release](https://img.shields.io/github/downloads/deskflow/deskflow/latest/total?style=for-the-badge&logo=github&label=Download%20Stable)](https://github.com/deskflow/deskflow/releases/latest)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Downloads: Continuous Build](https://img.shields.io/github/downloads/deskflow/deskflow/continuous/total?style=for-the-badge&logo=github&label=Download%20Continuous)](https://github.com/deskflow/deskflow/releases/continuous)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Download From Flathub](https://img.shields.io/flathub/downloads/org.deskflow.deskflow?style=for-the-badge&logo=flathub&label=Download%20from%20flathub)](https://flathub.org/apps/org.deskflow.deskflow)
 
