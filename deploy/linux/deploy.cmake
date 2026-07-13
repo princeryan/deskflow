@@ -67,6 +67,23 @@ if(ENABLE_UINPUT_LOGINSCREEN)
     DESTINATION ${SYSTEMD_USER_UNIT_DIR}
   )
 
+  # Server address discovery: keeps the "deskflow-server" hostname pointed at the
+  # server after a DHCP reshuffle. Installed but not enabled; opting in is a
+  # per-user "systemctl enable --now deskflow-discover@$USER.timer".
+  install(
+    PROGRAMS ${MY_DIR}/scripts/deskflow-discover.sh
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    RENAME deskflow-discover
+  )
+  configure_file(
+    ${MY_DIR}/systemd/deskflow-discover@.service.in
+    ${CMAKE_BINARY_DIR}/deskflow-discover@.service @ONLY
+  )
+  install(
+    FILES ${CMAKE_BINARY_DIR}/deskflow-discover@.service ${MY_DIR}/systemd/deskflow-discover@.timer
+    DESTINATION ${SYSTEMD_SYSTEM_UNIT_DIR}
+  )
+
   # udev rule: grant /dev/uinput to group "input"
   install(
     FILES ${MY_DIR}/udev/99-deskflow-uinput.rules
@@ -90,6 +107,11 @@ configure_file(
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "qt6-svg-plugins")
+# xclip: the clipboard helper reads/writes the selection through Xwayland (see
+# src/apps/deskflow-clipboard/main.cpp for why the Wayland clipboard is unusable
+# here). iproute2: deskflow-discover uses "ip" and "ss".
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "xclip, iproute2")
+set(CPACK_RPM_PACKAGE_REQUIRES "xclip, iproute")
 set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
 set(CPACK_RPM_PACKAGE_GROUP "Applications/System")
 

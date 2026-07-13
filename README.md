@@ -20,6 +20,7 @@ On top of Deskflow, this version adds:
 - **Control the login and lock screen too** — move between computers before you've signed in, not just after (Linux).
 - **Copy and paste files between computers**, not just text and pictures (Windows and Linux).
 - **A fresher look** that matches your system's light or dark theme, and can start automatically when you log in.
+- **Keeps working when your router changes the other computer's address** — optional on Linux, see [below](#when-your-router-keeps-changing-the-address-linux-only).
 
 ## Download this fork
 
@@ -50,6 +51,26 @@ systemctl --user enable --now deskflow-clipboard.service
 ```
 
 Then log out and back in once. Set the other computer's address and a screen name in the app first.
+
+### When your router keeps changing the address (Linux only)
+
+Most home routers hand out addresses that change over time, so the address you typed into Deskflow can quietly stop working — the app sits there retrying against an address nobody answers on any more.
+
+If that happens to you, give the other computer a name instead of an address. Set the server in the app to:
+
+```
+deskflow-server
+```
+
+and turn on the helper that keeps that name pointing at the right place:
+
+```sh
+sudo systemctl enable --now deskflow-discover@$USER.timer
+```
+
+It stays completely idle while Deskflow is connected. Only when the connection is lost does it look around your network for the other computer, and if it has moved, it updates the name and reconnects you. There's nothing to configure.
+
+The tidier alternative, if you're comfortable in your router's settings, is to give the other computer a fixed address (often called a "DHCP reservation" or "static lease"). Then the address never changes and you don't need this at all.
 
 > [!TIP]
 >
