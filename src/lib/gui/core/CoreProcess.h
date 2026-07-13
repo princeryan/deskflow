@@ -114,10 +114,17 @@ private:
   void startProcessFromDaemon(const QStringList &args);
   void stopForegroundProcess() const;
   void stopProcessFromDaemon();
-  // Drive the headless login-screen client (deskflow-uinput.service) instead of
-  // launching our own core, so the GUI is a front-end for the running service.
+  // Drive the headless login-screen client service instead of launching our own
+  // core, so the GUI is a front-end for the running service.
   void startExternalService();
   void stopExternalService();
+  // Attach to a service that is already running: tail its journal and reflect
+  // its state, without restarting it and dropping the user's connection.
+  void adoptExternalService();
+  void startJournalTail();
+  bool externalServiceIsActive() const;
+  static QString resolveServiceUnit();
+  static bool unitIsLoaded(const QString &unit);
   QString persistServerConfig() const;
   void setConnectionState(ConnectionState state);
   void setProcessState(ProcessState state);

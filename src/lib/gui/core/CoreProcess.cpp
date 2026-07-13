@@ -20,6 +20,8 @@
 #include <QMutexLocker>
 #include <QRegularExpression>
 
+#include <utility>
+
 namespace deskflow::gui {
 
 const int kRetryDelay = 1000;
@@ -101,8 +103,8 @@ CoreProcess::CoreProcess(const IServerConfig &serverConfig)
   // If the headless login-screen client service is installed, the GUI becomes a
   // front-end for it (Start/Stop control the service, logs come from its
   // journal) rather than launching its own core process.
-  m_serviceUnit = QStringLiteral("deskflow-uinput.service");
-  m_externalService = QFile::exists(QStringLiteral("/etc/systemd/system/") + m_serviceUnit);
+  m_serviceUnit = resolveServiceUnit();
+  m_externalService = !m_serviceUnit.isEmpty();
 
   if (!m_externalService && !QFile::exists(m_appPath)) {
     qFatal("core server binary does not exist");
@@ -306,7 +308,14 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
   }
 
   if (m_externalService) {
-    startExternalService();
+    // The service runs from boot, so it is normally already up by the time the
+    // GUI launches. Attach to it rather than restarting it, which would drop a
+    // working connection every time the user opens the window.
+    if (externalServiceIsActive()) {
+      adoptExternalService();
+    } else {
+      startExternalService();
+    }
     return;
   }
 
@@ -401,6 +410,69 @@ void CoreProcess::stop(std::optional<ProcessMode> processModeOption)
   setConnectionState(ConnectionState::Disconnected);
 }
 
+QString CoreProcess::resolveServiceUnit()
+{
+  // Packages ship a per-user template (deskflow-uinput@<user>.service); older
+  // hand-installed setups used a plain deskflow-uinput.service. Prefer the
+  // template instance for this user, and fall back to the plain unit.
+  auto user = qEnvironmentVariable("USER");
+  if (user.isEmpty()) {
+    user = QDir::home().dirName();
+  }
+
+  QStringList candidates;
+  if (!user.isEmpty()) {
+    candidates << QStringLiteral("deskflow-uinput@%1.service").arg(user);
+  }
+  candidates << QStringLiteral("deskflow-uinput.service");
+
+  for (const auto &unit : std::as_const(candidates)) {
+    if (unitIsLoaded(unit)) {
+      return unit;
+    }
+  }
+  return {};
+}
+
+bool CoreProcess::unitIsLoaded(const QString &unit)
+{
+  // Ask systemd rather than guessing unit paths: a template instance has no
+  // file of its own, and units may live in /etc, /usr/lib or /lib.
+  QProcess ctl;
+  ctl.start(
+      QStringLiteral("systemctl"),
+      {QStringLiteral("show"), QStringLiteral("-p"), QStringLiteral("LoadState"), QStringLiteral("--value"), unit}
+  );
+  if (!ctl.waitForFinished(2000)) {
+    ctl.kill();
+    return false;
+  }
+  return QString::fromUtf8(ctl.readAllStandardOutput()).trimmed() == QLatin1String("loaded");
+}
+
+bool CoreProcess::externalServiceIsActive() const
+{
+  QProcess ctl;
+  ctl.start(QStringLiteral("systemctl"), {QStringLiteral("is-active"), QStringLiteral("--quiet"), m_serviceUnit});
+  if (!ctl.waitForFinished(2000)) {
+    ctl.kill();
+    return false;
+  }
+  return ctl.exitStatus() == QProcess::NormalExit && ctl.exitCode() == 0;
+}
+
+void CoreProcess::adoptExternalService()
+{
+  qInfo("attaching to running login-screen client service: %s", qPrintable(m_serviceUnit));
+
+  // Deliberately no restart: the service is already connected. Replaying its
+  // recent journal through checkLogLine() recovers the real connection state.
+  setProcessState(ProcessState::Starting);
+  setConnectionState(ConnectionState::Connecting);
+  startJournalTail();
+  setProcessState(ProcessState::Started);
+}
+
 void CoreProcess::startExternalService()
 {
   qInfo("starting login-screen client service: %s", qPrintable(m_serviceUnit));
@@ -413,8 +485,16 @@ void CoreProcess::startExternalService()
   connect(ctl, &QProcess::finished, ctl, &QObject::deleteLater);
   ctl->start(QStringLiteral("systemctl"), {QStringLiteral("restart"), m_serviceUnit});
 
+  startJournalTail();
+
+  setProcessState(ProcessState::Started);
+}
+
+void CoreProcess::startJournalTail()
+{
   // Stream the service journal into the same log/connection-state pipeline the
-  // foreground process would have fed.
+  // foreground process would have fed. The replayed backlog is what tells us
+  // whether an already-running service is connected.
   if (!m_journalTail) {
     m_journalTail = new QProcess(this);
     connect(m_journalTail, &QProcess::readyReadStandardOutput, this, [this] {
@@ -423,13 +503,10 @@ void CoreProcess::startExternalService()
   }
   if (m_journalTail->state() == QProcess::NotRunning) {
     m_journalTail->start(
-        QStringLiteral("journalctl"),
-        {QStringLiteral("-u"), m_serviceUnit, QStringLiteral("-f"), QStringLiteral("-n"), QStringLiteral("30"),
-         QStringLiteral("-o"), QStringLiteral("cat")}
+        QStringLiteral("journalctl"), {QStringLiteral("-u"), m_serviceUnit, QStringLiteral("-f"), QStringLiteral("-n"),
+                                       QStringLiteral("200"), QStringLiteral("-o"), QStringLiteral("cat")}
     );
   }
-
-  setProcessState(ProcessState::Started);
 }
 
 void CoreProcess::stopExternalService()
