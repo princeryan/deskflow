@@ -123,7 +123,8 @@ bool readWholeFile(const std::wstring &path, std::string &out)
   std::uint64_t off = 0;
   bool ok = true;
   while (off < static_cast<std::uint64_t>(sz.QuadPart)) {
-    const DWORD chunk = static_cast<DWORD>(std::min<std::uint64_t>(static_cast<std::uint64_t>(sz.QuadPart) - off, 1u << 20));
+    const DWORD chunk =
+        static_cast<DWORD>(std::min<std::uint64_t>(static_cast<std::uint64_t>(sz.QuadPart) - off, 1u << 20));
     DWORD got = 0;
     if (!ReadFile(h, out.data() + off, chunk, &got, nullptr) || got == 0) {
       ok = false;

@@ -14,9 +14,9 @@
 #include "common/VersionInfo.h"
 #include "gui/Diagnostic.h"
 #include "gui/MainWindow.h"
-#include "gui/core/SystemTheme.h"
 #include "gui/Messages.h"
 #include "gui/StyleUtils.h"
+#include "gui/core/SystemTheme.h"
 
 #include <QApplication>
 #include <QCommandLineParser>

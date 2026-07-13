@@ -28,19 +28,19 @@ namespace {
 // A token->value map applied to the style-sheet template below.
 struct Palette
 {
-  QString bg;          // window background
-  QString surface;     // cards, inputs, buttons
-  QString surfaceAlt;  // log / sunken areas
-  QString border;      // hairline separators
-  QString borderStrong;// input outlines
-  QString text;        // primary text
-  QString textDim;     // secondary text
-  QString hover;       // subtle hover wash
-  QString accent;      // system accent
-  QString accentText;  // text on the accent
-  QString accentHover; // accent, slightly shifted for hover
-  QString accentSoft;  // accent at low alpha (selection wash)
-  QString control;     // raised button fill
+  QString bg;           // window background
+  QString surface;      // cards, inputs, buttons
+  QString surfaceAlt;   // log / sunken areas
+  QString border;       // hairline separators
+  QString borderStrong; // input outlines
+  QString text;         // primary text
+  QString textDim;      // secondary text
+  QString hover;        // subtle hover wash
+  QString accent;       // system accent
+  QString accentText;   // text on the accent
+  QString accentHover;  // accent, slightly shifted for hover
+  QString accentSoft;   // accent at low alpha (selection wash)
+  QString control;      // raised button fill
   QString controlHover;
   QString controlBorder;
 };
@@ -66,11 +66,12 @@ QString checkIconPath(const QColor &color)
   QDir().mkpath(dir);
   const QString path = dir + QStringLiteral("/deskflow-check-%1.svg").arg(hexName);
   if (!QFile::exists(path)) {
-    const QString svg =
-        QStringLiteral("<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>"
-                       "<path d='M3.5 8.5 l3 3 l6 -7.2' fill='none' stroke='%1' stroke-width='2.2' "
-                       "stroke-linecap='round' stroke-linejoin='round'/></svg>")
-            .arg(color.name(QColor::HexRgb));
+    const QString svg = QStringLiteral(
+                            "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'>"
+                            "<path d='M3.5 8.5 l3 3 l6 -7.2' fill='none' stroke='%1' stroke-width='2.2' "
+                            "stroke-linecap='round' stroke-linejoin='round'/></svg>"
+    )
+                            .arg(color.name(QColor::HexRgb));
     QFile f(path);
     if (f.open(QIODevice::WriteOnly)) {
       f.write(svg.toUtf8());

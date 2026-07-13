@@ -30,19 +30,16 @@
 #include "gui/widgets/LogDock.h"
 #include "net/FingerprintDatabase.h"
 
+#include <QButtonGroup>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QButtonGroup>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMenu>
-#include <QStackedWidget>
-#include <QToolButton>
-#include <QVBoxLayout>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
@@ -53,6 +50,9 @@
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QStackedWidget>
+#include <QToolButton>
+#include <QVBoxLayout>
 
 #include <memory>
 
@@ -243,8 +243,8 @@ void MainWindow::buildAppShell()
     w->setMinimumHeight(0);
     w->setMaximumHeight(QWIDGETSIZE_MAX);
   }
-  for (auto *b : {ui->btnEditName, ui->btnConfigureClient, ui->btnConfigureServer, ui->btnSaveServerConfig,
-                  ui->btnToggleCore}) {
+  for (auto *b :
+       {ui->btnEditName, ui->btnConfigureClient, ui->btnConfigureServer, ui->btnSaveServerConfig, ui->btnToggleCore}) {
     b->setMinimumHeight(0);
     b->setMaximumHeight(QWIDGETSIZE_MAX);
     b->setFixedHeight(34);
@@ -1270,14 +1270,10 @@ void MainWindow::notifyConnectionChange(CoreConnectionState state)
   constexpr int kNotifyMs = 5000;
 
   if (state == CoreConnectionState::Disconnected && m_lastConnectionState == CoreConnectionState::Connected) {
-    m_trayIcon->showMessage(
-        tr("Deskflow"), tr("Disconnected from the server."), QSystemTrayIcon::Warning, kNotifyMs
-    );
+    m_trayIcon->showMessage(tr("Deskflow"), tr("Disconnected from the server."), QSystemTrayIcon::Warning, kNotifyMs);
     m_notifiedDisconnect = true;
   } else if (state == CoreConnectionState::Connected && m_notifiedDisconnect) {
-    m_trayIcon->showMessage(
-        tr("Deskflow"), tr("Reconnected to the server."), QSystemTrayIcon::Information, kNotifyMs
-    );
+    m_trayIcon->showMessage(tr("Deskflow"), tr("Reconnected to the server."), QSystemTrayIcon::Information, kNotifyMs);
     m_notifiedDisconnect = false;
   }
 }

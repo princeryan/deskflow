@@ -415,8 +415,9 @@ bool UInputScreen::setClipboard(ClipboardID id, const IClipboard *clipboard)
   std::uint8_t count = 0;
   if (clipboard->open(0)) {
     using enum IClipboard::Format;
-    for (const auto &[id2, fmt] : {std::pair{std::uint8_t{0}, Text}, std::pair{std::uint8_t{1}, HTML},
-                                   std::pair{std::uint8_t{2}, Bitmap}, std::pair{std::uint8_t{3}, File}}) {
+    for (const auto &[id2, fmt] :
+         {std::pair{std::uint8_t{0}, Text}, std::pair{std::uint8_t{1}, HTML}, std::pair{std::uint8_t{2}, Bitmap},
+          std::pair{std::uint8_t{3}, File}}) {
       if (clipboard->has(fmt)) {
         frameAppend(body, id2, clipboard->get(fmt));
         ++count;

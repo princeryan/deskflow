@@ -1029,7 +1029,6 @@ Enabling this setting will disable the server config GUI.</string>
   <tabstop>cbSwitchDoubleTap</tabstop>
   <tabstop>sbSwitchDoubleTap</tabstop>
   <tabstop>cbEnableClipboard</tabstop>
-  <tabstop>sbClipboardSizeLimit</tabstop>
   <tabstop>cbHeartbeat</tabstop>
   <tabstop>sbHeartbeat</tabstop>
   <tabstop>cbRelativeMouseMoves</tabstop>

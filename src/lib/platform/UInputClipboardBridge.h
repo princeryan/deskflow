@@ -36,7 +36,9 @@ public:
   UInputClipboardBridge() = default;
   ~UInputClipboardBridge();
 
-  void start() {}
+  void start()
+  {
+  }
   void stop();
 
   //! Read the session clipboard now; returns a frame (empty on failure).

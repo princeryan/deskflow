@@ -369,8 +369,10 @@ void applyWriteFrame(const QByteArray &frame)
     QByteArray bmp;
     bmp.append("BM");
     auto le32 = [&](std::uint32_t v) {
-      char b[4] = {static_cast<char>(v & 0xff), static_cast<char>((v >> 8) & 0xff), static_cast<char>((v >> 16) & 0xff),
-                   static_cast<char>((v >> 24) & 0xff)};
+      char b[4] = {
+          static_cast<char>(v & 0xff), static_cast<char>((v >> 8) & 0xff), static_cast<char>((v >> 16) & 0xff),
+          static_cast<char>((v >> 24) & 0xff)
+      };
       bmp.append(b, 4);
     };
     le32(fileSize);
