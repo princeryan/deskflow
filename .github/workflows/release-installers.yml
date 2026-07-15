@@ -117,9 +117,15 @@ jobs:
           merge-multiple: true
           path: dist
 
-      - name: Checksums
+      - name: Flatten and checksum
         working-directory: dist
-        run: sha256sum deskflow-* > sums.txt
+        # The Linux build runs in a container, so its artifact preserves the
+        # absolute workspace path (build/deskflow-*.deb ends up nested under
+        # __w/.../build/) while the macOS/Windows installers land flat. Pull any
+        # nested installers up to the root so the globs below catch all three.
+        run: |
+          find . -mindepth 2 -type f -name 'deskflow-*' -exec mv -t . {} +
+          sha256sum deskflow-* > sums.txt
 
       - name: Publish
         uses: softprops/action-gh-release@v2
