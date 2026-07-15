@@ -52,8 +52,9 @@ namespace {
 
 std::string socketPath()
 {
+  // Must match UInputClipboardBridge::socketPath() -- the client dials what this binds.
   const char *rt = std::getenv("XDG_RUNTIME_DIR");
-  std::string dir = (rt != nullptr && *rt != '\0') ? rt : "/tmp";
+  std::string dir = (rt != nullptr && *rt != '\0') ? rt : "/run/user/" + std::to_string(::getuid());
   return dir + "/deskflow-clipboard.sock";
 }
 

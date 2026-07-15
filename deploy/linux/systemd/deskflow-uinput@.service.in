@@ -31,6 +31,11 @@ Type=simple
 User=%i
 SupplementaryGroups=input
 Environment=DESKFLOW_UINPUT=1
+# Note on the clipboard socket: this system unit starts with no XDG_RUNTIME_DIR,
+# while the clipboard helper (a user service) binds its socket under the user's
+# runtime dir. The client derives the same path from getuid() (see
+# UInputClipboardBridge::socketPath), so no XDG_RUNTIME_DIR is set here -- and it
+# can't be, since systemd %U in a system unit is the manager UID (root), not User=%i.
 ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/deskflow-core client
 Restart=always
 RestartSec=3

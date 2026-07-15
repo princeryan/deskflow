@@ -67,8 +67,12 @@ void UInputClipboardBridge::stop()
 
 std::string UInputClipboardBridge::socketPath()
 {
+  // The client runs from a system unit, which starts with no XDG_RUNTIME_DIR; the
+  // helper runs in the user session, which always has one. Both must resolve to the
+  // same per-user runtime dir or they bind and dial different sockets and the
+  // clipboard silently does nothing.
   const char *rt = std::getenv("XDG_RUNTIME_DIR");
-  std::string dir = (rt != nullptr && *rt != '\0') ? rt : "/tmp";
+  std::string dir = (rt != nullptr && *rt != '\0') ? rt : "/run/user/" + std::to_string(::getuid());
   return dir + "/deskflow-clipboard.sock";
 }
 
