@@ -25,6 +25,9 @@
 namespace deskflow::gui {
 
 const int kRetryDelay = 1000;
+// `systemctl stop` on this unit settles in milliseconds; the budget only exists
+// so a wedged systemd degrades into a warning instead of a hung GUI.
+const int kServiceStopTimeout = 5000;
 const auto kLineSplitRegex = QRegularExpression("\r|\n|\r\n");
 
 QString CoreProcess::processModeToString(const Settings::ProcessMode mode)
@@ -519,9 +522,18 @@ void CoreProcess::stopExternalService()
     m_journalTail->waitForFinished(1000);
   }
 
-  auto *ctl = new QProcess(this);
-  connect(ctl, &QProcess::finished, ctl, &QObject::deleteLater);
-  ctl->start(QStringLiteral("systemctl"), {QStringLiteral("stop"), m_serviceUnit});
+  // Block until the unit has actually stopped. restart() stops and then starts,
+  // and start() chooses between adopting and starting from `systemctl is-active`;
+  // with the stop still queued that query reports the unit active, so the GUI
+  // adopts a service that is about to exit and never starts one, leaving the
+  // machine with no client at all until someone intervenes by hand.
+  QProcess ctl;
+  ctl.start(QStringLiteral("systemctl"), {QStringLiteral("stop"), m_serviceUnit});
+  if (!ctl.waitForFinished(kServiceStopTimeout)) {
+    ctl.kill();
+    ctl.waitForFinished(1000);
+    qWarning("timed out stopping login-screen client service: %s", qPrintable(m_serviceUnit));
+  }
 
   setProcessState(ProcessState::Stopped);
   setConnectionState(ConnectionState::Disconnected);
