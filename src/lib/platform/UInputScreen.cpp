@@ -180,10 +180,30 @@ void UInputScreen::fakeKey(std::uint32_t keycode, bool isDown) const
   syn(m_keyboardFd);
 }
 
-void UInputScreen::moveAbsolute(std::int32_t x, std::int32_t y) const
+void UInputScreen::moveAbsolute(std::int32_t x, std::int32_t y, bool force) const
 {
   m_cursorX = std::clamp(x, 0, m_w - 1);
   m_cursorY = std::clamp(y, 0, m_h - 1);
+
+  if (force) {
+    // The kernel drops an EV_ABS that carries the value the device already
+    // holds, and then drops the SYN_REPORT closing the now-empty report along
+    // with it, so re-sending the position we last sent injects precisely
+    // nothing. Our shadow only tracks what *we* injected, so when another
+    // uinput client -- a remote-desktop tool sharing this seat, say -- has
+    // moved the real pointer meanwhile, the shadow still matches the device
+    // and the placement is silently swallowed. The pointer then never arrives
+    // where the server put us, and because relative moves are resolved against
+    // the shadow, every later move stays anchored to a position the cursor
+    // does not occupy. Step a pixel off target first so the report carrying
+    // the real position is always a genuine change on both axes.
+    const std::int32_t stepX = m_cursorX > 0 ? m_cursorX - 1 : std::min(m_cursorX + 1, m_w - 1);
+    const std::int32_t stepY = m_cursorY > 0 ? m_cursorY - 1 : std::min(m_cursorY + 1, m_h - 1);
+    emit(m_pointerFd, EV_ABS, ABS_X, stepX);
+    emit(m_pointerFd, EV_ABS, ABS_Y, stepY);
+    syn(m_pointerFd);
+  }
+
   emit(m_pointerFd, EV_ABS, ABS_X, m_cursorX);
   emit(m_pointerFd, EV_ABS, ABS_Y, m_cursorY);
   syn(m_pointerFd);
@@ -288,8 +308,12 @@ void UInputScreen::disable()
 void UInputScreen::enter()
 {
   m_isOnScreen = true;
-  // Flush the position latched before we were on-screen.
-  moveAbsolute(m_cursorX, m_cursorY);
+  // Flush the position latched before we were on-screen. This must be forced:
+  // entering at the same edge position as last time leaves the latched value
+  // equal to our shadow, and anything else sharing the seat may have moved the
+  // real cursor while we were away, so an unforced report would be dropped and
+  // the pointer would never arrive.
+  moveAbsolute(m_cursorX, m_cursorY, /*force=*/true);
 }
 
 bool UInputScreen::canLeave()

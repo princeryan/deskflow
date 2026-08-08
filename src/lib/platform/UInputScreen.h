@@ -86,7 +86,9 @@ private:
   //! Emit one evdev event followed by a SYN_REPORT is done separately.
   void emit(int fd, std::uint16_t type, std::uint16_t code, std::int32_t value) const;
   void syn(int fd) const;
-  void moveAbsolute(std::int32_t x, std::int32_t y) const;
+  //! Place the pointer. Set \p force when the position must reach the
+  //! compositor even if it matches what we last injected (see the definition).
+  void moveAbsolute(std::int32_t x, std::int32_t y, bool force = false) const;
 
   bool m_isPrimary = false;
   IEventQueue *m_events = nullptr;
