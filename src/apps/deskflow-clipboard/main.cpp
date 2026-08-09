@@ -82,6 +82,15 @@ bool readAll(int fd, char *buf, size_t len)
   return true;
 }
 
+// xclip budgets. Reading a selection is only as fast as the owning application
+// serves it, and a slow owner handing over a ~1MB image can take seconds, so
+// the I/O budget is generous. It stays under the 8000ms the client's bridge
+// allows per read (UInputClipboardBridge::readAll), so the helper always gives
+// up before the client does rather than leaving it waiting on a dead helper.
+constexpr int kXclipStartMs = 800;
+constexpr int kXclipIoMs = 5000;
+constexpr int kXclipReapMs = 200;
+
 // xclip needs an X display + auth; supply them even if the service env is bare.
 QProcessEnvironment xclipEnv()
 {
@@ -99,6 +108,17 @@ QProcessEnvironment xclipEnv()
   return env;
 }
 
+// Qt's ~QProcess warns ("Destroyed while process is still running") and then
+// blocks in waitForFinished() when the child outlives the QProcess. Every exit
+// path below must therefore leave the child reaped, not merely abandoned.
+void xclipReap(QProcess &p)
+{
+  if (p.state() == QProcess::NotRunning)
+    return;
+  p.kill();
+  p.waitForFinished(kXclipReapMs);
+}
+
 QByteArray xclipRead(const QString &target)
 {
   QProcess p;
@@ -107,9 +127,17 @@ QByteArray xclipRead(const QString &target)
       QStringLiteral("xclip"),
       {QStringLiteral("-selection"), QStringLiteral("clipboard"), QStringLiteral("-o"), QStringLiteral("-t"), target}
   );
-  if (!p.waitForStarted(800))
+  if (!p.waitForStarted(kXclipStartMs)) {
+    xclipReap(p);
     return {};
-  p.waitForFinished(1200);
+  }
+  if (!p.waitForFinished(kXclipIoMs)) {
+    // Whatever arrived so far is a truncated selection (a half-read PNG, say).
+    // Returning it would ship corrupt data to the peer, so drop it entirely.
+    xclipReap(p);
+    qWarning("clipboard read timed out for target '%s'", qPrintable(target));
+    return {};
+  }
   return p.readAllStandardOutput();
 }
 
@@ -122,13 +150,20 @@ void xclipWrite(const QByteArray &data, const QString &target)
   if (!target.isEmpty())
     args << QStringLiteral("-t") << target;
   p.start(QStringLiteral("xclip"), args);
-  if (!p.waitForStarted(800))
+  if (!p.waitForStarted(kXclipStartMs)) {
+    xclipReap(p);
     return;
+  }
   p.write(data);
   p.closeWriteChannel();
   // xclip forks a daemon to serve the selection and the parent exits; just wait
-  // for that parent so we don't leave a zombie.
-  p.waitForFinished(1200);
+  // for that parent so we don't leave a zombie. Killing on timeout only reaches
+  // that parent -- the forked daemon is already reparented -- so a selection
+  // that was successfully handed off survives.
+  if (!p.waitForFinished(kXclipIoMs)) {
+    xclipReap(p);
+    qWarning("clipboard write timed out for target '%s'", qPrintable(target));
+  }
 }
 
 void frameAdd(QByteArray &body, std::uint8_t &count, std::uint8_t id, const QByteArray &data)
