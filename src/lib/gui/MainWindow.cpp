@@ -362,8 +362,10 @@ void MainWindow::buildAppShell()
   auto *appMenu = new QMenu(menuButton);
   appMenu->addAction(m_actionSettings);
   appMenu->addSeparator();
-  appMenu->addAction(m_actionReportBug);
-  appMenu->addAction(m_actionClearSettings);
+  // Upstream retired the standalone report-bug and clear-settings actions;
+  // clearing settings now lives inside the settings dialog.
+  appMenu->addAction(m_actionShowHelp);
+  appMenu->addAction(m_actionAbout);
   appMenu->addSeparator();
   appMenu->addAction(m_actionQuit);
   menuButton->setMenu(appMenu);
