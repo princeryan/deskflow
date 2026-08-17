@@ -26,6 +26,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Without these the action cannot reach the code-scanning API and fails with
+# "Resource not accessible by integration" before it ever builds anything.
+# Upstream inherits them from its org-level default token permissions; a fork
+# gets the read-only default, so state them explicitly.
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
 jobs:
   codeql:
     runs-on: ubuntu-latest
