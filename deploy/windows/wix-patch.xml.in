@@ -17,11 +17,11 @@
       />
     </ServiceInstall>
     <!--
-      Wait="no" on purpose. The service is Start="auto" and configured to restart
-      on failure, so nothing is lost by not blocking here -- but blocking is
-      actively harmful: if the daemon takes longer than the SCM's 30s window to
-      report itself running, Windows Installer fails the whole transaction with
-      "Error 1920 ... verify that you have sufficient privileges" (which has
+      Wait="no" on purpose. The service is Start="auto" and configured to
+      restart on failure, so nothing is lost by not blocking here, and blocking
+      is actively harmful: if the daemon takes longer than the SCM's 30s window
+      to report itself running, Windows Installer fails the whole transaction
+      with "Error 1920 . verify that you have sufficient privileges" (which has
       nothing to do with privileges) and rolls back. On a major upgrade that
       rollback removes the new files without restoring the old ones, leaving an
       install with no Qt runtime and nothing that will start.
@@ -55,12 +55,12 @@
       binaries) also complete without prompting for a reboot.
 
       CloseMessage="no": asking politely does not work here. WM_CLOSE on the GUI
-      is a request to close the *window*, and with the default "leave app running
-      in the notification area" setting the GUI honours it by hiding to the tray
-      and carrying on running -- so the installer sits in "Validating install"
-      waiting for a process that has already decided not to exit. The core and
-      daemon have no window to close in the first place. Terminate them instead;
-      none of them hold unsaved state.
+      is a request to close the *window*, and with the default "leave app
+      running in the notification area" setting the GUI honours it by hiding to
+      the tray and carrying on running, so the installer sits in "Validating
+      install" waiting for a process that has already decided not to exit. The
+      core and daemon have no window to close in the first place. Terminate them
+      instead; none of them hold unsaved state.
     -->
     <util:CloseApplication
       Id="CloseDeskflowGui"

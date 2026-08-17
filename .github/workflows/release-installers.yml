@@ -89,7 +89,23 @@ jobs:
 
       - name: Build installer
         shell: bash
-        run: cmake --build build --config Release -j8 --target package
+        # CPack's DMG generator regularly loses the race to detach /Volumes/Deskflow
+        # and fails the whole job for it, so retry rather than burn a full matrix
+        # run on a flake. Upstream does the same in continuous-integration.yml.
+        run: |
+          packaged=false
+          for i in $(seq 1 5); do
+            if cmake --build build --config Release -j8 --target package; then
+              packaged=true
+              break
+            fi
+            echo "Package attempt $i failed"
+            sleep 5
+          done
+          if [ "$packaged" != true ]; then
+            echo "Packaging failed after 5 attempts" >&2
+            exit 1
+          fi
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
