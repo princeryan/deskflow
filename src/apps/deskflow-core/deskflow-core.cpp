@@ -67,10 +67,35 @@ App *createApp(const CoreArgParser &parser, EventQueue &events, const QString &p
   return nullptr;
 }
 
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MAC)
+//! Keep a display-less core running.
+/*!
+The core is a QApplication, so Qt insists on a platform plugin and aborts the
+process when it cannot load one. That is fatal exactly where this fork needs the
+core most: the uinput client runs from a system unit at the login screen, with
+no session and no DISPLAY to connect to. Nothing about the core actually draws,
+so fall back to the offscreen platform when there is no display server to talk
+to. An explicit QT_QPA_PLATFORM still wins.
+*/
+void useOffscreenPlatformIfHeadless()
+{
+  if (qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+    return;
+  if (qEnvironmentVariableIsSet("DISPLAY") || qEnvironmentVariableIsSet("WAYLAND_DISPLAY"))
+    return;
+
+  qputenv("QT_QPA_PLATFORM", "offscreen");
+}
+#endif
+
 int main(int argc, char **argv)
 {
 #if defined(Q_OS_WIN)
   ArchMiscWindows::setInstanceWin32(GetModuleHandle(nullptr));
+#endif
+
+#if defined(Q_OS_UNIX) && !defined(Q_OS_MAC)
+  useOffscreenPlatformIfHeadless();
 #endif
 
   QApplication::setApplicationName(QStringLiteral("%1 Core").arg(kAppName));
