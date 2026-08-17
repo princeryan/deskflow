@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-License-Identifier: MIT
+#
+# Session clipboard helper for the login-screen (uinput) client. This is a
+# systemd *user* unit -- it must run inside your graphical session so it can
+# reach the compositor's clipboard. Enable it with:
+#
+#     systemctl --user enable --now deskflow-clipboard.service
+#
+# It creates $XDG_RUNTIME_DIR/deskflow-clipboard.sock, which the system-wide
+# deskflow-uinput@.service connects to for clipboard read/write. It has no
+# effect at the greeter (there is no user session yet).
+
+[Unit]
+Description=Deskflow session clipboard helper (native clipboard bridge)
+Documentation=https://github.com/deskflow/deskflow
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/deskflow-clipboard
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target

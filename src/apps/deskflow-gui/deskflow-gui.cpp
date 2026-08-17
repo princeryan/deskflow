@@ -16,6 +16,7 @@
 #include "gui/MainWindow.h"
 #include "gui/Messages.h"
 #include "gui/StyleUtils.h"
+#include "gui/core/SystemTheme.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -118,9 +119,11 @@ int main(int argc, char *argv[])
     return s_exitDuplicate;
   }
 
-  if (!deskflow::platform::isMac() && qEnvironmentVariable("XDG_CURRENT_DESKTOP") != QLatin1String("KDE")) {
+#if defined(Q_OS_LINUX)
+  if (qEnvironmentVariable("XDG_CURRENT_DESKTOP") != QLatin1String("KDE")) {
     QApplication::setStyle("fusion");
   }
+#endif
 
   // Sets the fallback icon path and fallback theme
   updateIconTheme();
@@ -148,6 +151,12 @@ int main(int argc, char *argv[])
   if (parser.isSet(resetOption)) {
     diagnostic::clearSettings(false);
   }
+
+#if defined(Q_OS_LINUX)
+  // Follow the desktop light/dark + accent, restyled for clarity (Linux only).
+  auto *systemTheme = new deskflow::gui::SystemTheme(&app);
+  systemTheme->apply();
+#endif
 
   MainWindow mainWindow;
   mainWindow.open();

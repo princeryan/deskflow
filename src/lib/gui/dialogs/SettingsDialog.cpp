@@ -15,6 +15,7 @@
 #include "common/Settings.h"
 #include "gui/Messages.h"
 #include "gui/TlsUtility.h"
+#include "gui/core/AutoStart.h"
 #include "gui/core/NetworkMonitor.h"
 
 #include <QComboBox>
@@ -237,6 +238,10 @@ void SettingsDialog::accept()
   Settings::setValue(Settings::Security::KeySize, ui->comboTlsKeyLength->currentText().toInt());
   Settings::setValue(Settings::Security::TlsEnabled, ui->groupSecurity->isChecked());
   Settings::setValue(Settings::Gui::CloseToTray, ui->rbCloseToTray->isChecked());
+  Settings::setValue(Settings::Gui::NotifyOnConnectionChange, ui->cbNotifyOnConnectionChange->isChecked());
+  Settings::setValue(Settings::Gui::StartOnLogin, ui->cbStartOnLogin->isChecked());
+  if (AutoStart::isSupported())
+    AutoStart::setEnabled(ui->cbStartOnLogin->isChecked());
   Settings::setValue(Settings::Gui::SymbolicTrayIcon, ui->rbIconMono->isChecked());
   Settings::setValue(Settings::Security::CheckPeers, ui->cbRequireClientCert->isChecked());
   Settings::setValue(Settings::Core::Language, I18N::nativeTo639Name(ui->comboLanguage->currentText()));
@@ -266,6 +271,9 @@ void SettingsDialog::loadFromConfig()
   ui->groupLogToFile->setChecked(Settings::value(Settings::Log::ToFile).toBool());
   ui->lineLogFilename->setText(Settings::value(Settings::Log::File).toString());
   ui->cbPreventSleep->setChecked(Settings::value(Settings::Core::PreventSleep).toBool());
+  ui->cbNotifyOnConnectionChange->setChecked(Settings::value(Settings::Gui::NotifyOnConnectionChange).toBool());
+  ui->cbStartOnLogin->setChecked(Settings::value(Settings::Gui::StartOnLogin).toBool());
+  ui->cbStartOnLogin->setEnabled(AutoStart::isSupported());
   ui->cbElevateDaemon->setChecked(Settings::value(Settings::Daemon::Elevate).toBool());
   ui->cbAutoUpdate->setChecked(Settings::value(Settings::Gui::AutoUpdateCheck).toBool());
   ui->cbGuiDebug->setChecked(Settings::value(Settings::Log::GuiDebug).toBool());

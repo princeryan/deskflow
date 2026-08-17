@@ -26,6 +26,19 @@
 
 class QAction;
 class QMenu;
+class QLabel;
+class QButtonGroup;
+class QStackedWidget;
+class QLineEdit;
+class QGroupBox;
+class QPushButton;
+class QTextEdit;
+class QComboBox;
+class QTabWidget;
+class QCheckBox;
+class QRadioButton;
+class QMessageBox;
+class QAbstractButton;
 class QLocalServer;
 
 class DeskflowApplication;
@@ -84,11 +97,18 @@ private:
   void updateText();
   void toggleLogVisible(bool visible);
 
+  // Rebuilds the window as an App Center-style shell: a left sidebar of nav
+  // items and a content area of rounded cards. Re-parents the existing controls
+  // into pages so all wiring is preserved.
+  void buildAppShell();
+
   void settingsChanged(const QString &key = QString());
   void serverConfigSaving();
   void coreProcessError(CoreProcess::Error error);
   void coreConnectionStateChanged(ConnectionState state);
+  void notifyConnectionChange(ConnectionState state);
   void coreProcessStateChanged(ProcessState state);
+
 
   void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
   void serverConnectionConfigureClient(const QString &clientName);
@@ -165,6 +185,11 @@ private:
 
   VersionChecker m_versionChecker;
   bool m_secureSocket = false;
+  // Tracks connection transitions so we only notify on genuine disconnect/reconnect
+  // (not on the very first connect, which has its own welcome message).
+  deskflow::gui::CoreProcess::ConnectionState m_lastConnectionState =
+      deskflow::gui::CoreProcess::ConnectionState::Disconnected;
+  bool m_notifiedDisconnect = false;
   bool m_saveOnExit = true;
   bool m_clientErrorVisible = false;
   ServerConfig m_serverConfig;
@@ -181,6 +206,8 @@ private:
 
   LogDock *m_logDock;
   StatusBar *m_statusBar = nullptr;
+  QButtonGroup *m_nav = nullptr;
+  QStackedWidget *m_contentStack = nullptr;
 
   // Window Menu
   QMenu *m_menuFile = nullptr;

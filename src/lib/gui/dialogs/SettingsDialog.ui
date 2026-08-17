@@ -240,6 +240,26 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cbStartOnLogin">
+         <property name="toolTip">
+          <string>Launch Deskflow automatically when you log in.</string>
+         </property>
+         <property name="text">
+          <string>Start Deskflow on login</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbNotifyOnConnectionChange">
+         <property name="toolTip">
+          <string>Show a notification when the connection to the server is lost or restored.</string>
+         </property>
+         <property name="text">
+          <string>Notify when the connection is lost or restored</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_11">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>

@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-License-Identifier: MIT
+#
+# Drives deskflow-discover@%i.service. Enable with:
+#
+#     sudo systemctl enable --now deskflow-discover@$USER.timer
+
+[Unit]
+Description=Periodically check that the Deskflow client can still reach its server
+
+[Timer]
+OnBootSec=45s
+OnUnitInactiveSec=60s
+AccuracySec=5s
+Unit=deskflow-discover@%i.service
+
+[Install]
+WantedBy=timers.target

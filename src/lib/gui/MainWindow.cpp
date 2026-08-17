@@ -31,10 +31,14 @@
 #include "net/FingerprintDatabase.h"
 #include "widgets/StatusBar.h"
 
+#include <QButtonGroup>
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QFrame>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QMenu>
@@ -46,7 +50,11 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScreen>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QStackedWidget>
+#include <QToolButton>
+#include <QVBoxLayout>
 
 #include <memory>
 
@@ -156,8 +164,240 @@ MainWindow::MainWindow()
 
   applyConfig();
   m_statusBar->setSecurityIcon(TlsUtility::isEnabled());
+
+  // Reshape the window into the App Center-style sidebar + cards layout (Linux only).
+  // Must run before restoreWindow() so the saved geometry applies to the final layout.
+#if defined(Q_OS_LINUX)
+  buildAppShell();
+#endif
+
   restoreWindow();
 }
+
+void MainWindow::buildAppShell()
+{
+  // A rounded "card" that hosts an existing control (re-parented, so its signal
+  // wiring is preserved), optionally under a small caption.
+  auto makeCard = [](QWidget *inner, const QString &caption) -> QFrame * {
+    auto *card = new QFrame;
+    card->setObjectName(QStringLiteral("card"));
+    auto *v = new QVBoxLayout(card);
+    v->setContentsMargins(20, 20, 20, 20);
+    v->setSpacing(16);
+    if (!caption.isEmpty()) {
+      auto *cap = new QLabel(caption);
+      cap->setObjectName(QStringLiteral("cardTitle"));
+      v->addWidget(cap);
+    }
+    if (inner) {
+      inner->setParent(card);
+      inner->setVisible(true);
+      v->addWidget(inner);
+    }
+    return card;
+  };
+
+  // Each page scrolls, so content is never clipped at small window sizes.
+  auto makePage = [](const QString &title) -> std::pair<QWidget *, QVBoxLayout *> {
+    auto *content = new QWidget;
+    content->setObjectName(QStringLiteral("page"));
+    auto *v = new QVBoxLayout(content);
+    v->setContentsMargins(24, 24, 24, 24);
+    v->setSpacing(20);
+    auto *t = new QLabel(title);
+    t->setObjectName(QStringLiteral("pageTitle"));
+    v->addWidget(t);
+
+    auto *scroll = new QScrollArea;
+    scroll->setObjectName(QStringLiteral("pageScroll"));
+    scroll->setWidget(content);
+    scroll->setWidgetResizable(true);
+    scroll->setFrameShape(QFrame::NoFrame);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    return {scroll, v};
+  };
+
+  // Primary action gets the accent treatment.
+  ui->btnToggleCore->setProperty("accent", true);
+
+  // These were flat / icon-only, so they read as icons rather than buttons.
+  // Make them plain, clearly-labelled buttons.
+  ui->btnEditName->setFlat(false);
+  ui->btnEditName->setIcon(QIcon());
+  ui->btnEditName->setText(tr("Rename"));
+  // Restart is redundant with Connect (which restarts the service); hide it.
+  ui->btnRestartCore->setVisible(false);
+  // Primary action sits bottom-right of the card (convention).
+  if (auto *hb = qobject_cast<QHBoxLayout *>(ui->horizontalWidget->layout()))
+    hb->insertStretch(0);
+  // No decorative icons on the other action buttons either.
+  ui->btnConfigureClient->setIcon(QIcon());
+  ui->btnConfigureServer->setIcon(QIcon());
+  ui->btnSaveServerConfig->setIcon(QIcon());
+
+  // Several containers/buttons carry fixed heights from the .ui (28px name row,
+  // 32px button rows) that clip the rounded pills. Clear those caps.
+  for (auto *w : {ui->widget, ui->horizontalWidget, ui->serverOptions, ui->clientOptions}) {
+    w->setMinimumHeight(0);
+    w->setMaximumHeight(QWIDGETSIZE_MAX);
+  }
+  for (auto *b :
+       {ui->btnEditName, ui->btnConfigureClient, ui->btnConfigureServer, ui->btnSaveServerConfig, ui->btnToggleCore}) {
+    b->setMinimumHeight(0);
+    b->setMaximumHeight(QWIDGETSIZE_MAX);
+    b->setFixedHeight(34);
+  }
+
+  // Present the two modes as a vertical choice list (one option per row) rather
+  // than a cramped horizontal pair.
+  if (auto *oldModeLayout = ui->widgetModeSelection->layout()) {
+    oldModeLayout->removeWidget(ui->rbModeServer);
+    oldModeLayout->removeWidget(ui->rbModeClient);
+    delete oldModeLayout;
+  }
+  auto *modeCol = new QVBoxLayout(ui->widgetModeSelection);
+  modeCol->setContentsMargins(0, 0, 0, 0);
+  modeCol->setSpacing(6);
+  modeCol->addWidget(ui->rbModeServer);
+  modeCol->addWidget(ui->rbModeClient);
+
+  // Stack the mode options vertically (address on its own row, actions below)
+  // so nothing gets cramped, and let the address field fill its row.
+  if (auto *oldOpts = ui->widgetModeOptions->layout()) {
+    oldOpts->removeWidget(ui->serverOptions);
+    oldOpts->removeWidget(ui->lblNoMode);
+    oldOpts->removeWidget(ui->clientOptions);
+    oldOpts->removeWidget(ui->horizontalWidget);
+    delete oldOpts;
+  }
+  auto *optsCol = new QVBoxLayout(ui->widgetModeOptions);
+  optsCol->setContentsMargins(0, 0, 0, 0);
+  optsCol->setSpacing(12);
+  optsCol->addWidget(ui->serverOptions);
+  optsCol->addWidget(ui->lblNoMode);
+  optsCol->addWidget(ui->clientOptions);
+  optsCol->addWidget(ui->horizontalWidget);
+  ui->lineHostname->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  ui->lineHostname->setMinimumWidth(150);
+
+  // --- Connection page: "this computer" + mode/connect cards ---
+  auto [connPage, connLayout] = makePage(tr("Connection"));
+  connLayout->addWidget(makeCard(ui->widget, tr("This computer")));
+  connLayout->addWidget(makeCard(ui->groupBox, tr("Connect to")));
+  connLayout->addStretch(1);
+
+  // --- Activity page: the log ---
+  auto [logPage, logLayout] = makePage(tr("Activity"));
+  QWidget *logInner = m_logDock ? m_logDock->widget() : nullptr;
+  logLayout->addWidget(makeCard(logInner, QString()), 1);
+  if (m_logDock) {
+    // The old dock's toggle re-applies setFixedSize() (locking the window to a
+    // small size); it's obsolete now the log is a page, so disconnect it.
+    disconnect(m_logDock->toggleViewAction(), nullptr, this, nullptr);
+    removeDockWidget(m_logDock);
+    m_logDock->hide();
+  }
+
+  // --- About page ---
+  auto [aboutPage, aboutLayout] = makePage(tr("About"));
+  auto *aboutCard = new QFrame;
+  aboutCard->setObjectName(QStringLiteral("card"));
+  auto *av = new QVBoxLayout(aboutCard);
+  av->setContentsMargins(20, 18, 20, 18);
+  av->setSpacing(6);
+  auto *appName = new QLabel(QStringLiteral("Deskflow"));
+  appName->setObjectName(QStringLiteral("cardTitle"));
+  auto *ver = new QLabel(tr("Version %1").arg(QApplication::applicationVersion()));
+  ver->setProperty("dim", true);
+  av->addWidget(appName);
+  av->addWidget(ver);
+  aboutLayout->addWidget(aboutCard);
+  aboutLayout->addStretch(1);
+
+  m_contentStack = new QStackedWidget;
+  m_contentStack->addWidget(connPage);
+  m_contentStack->addWidget(logPage);
+  m_contentStack->addWidget(aboutPage);
+
+  // --- Sidebar navigation: exclusive checkable buttons (not a list) ---
+  auto *navWidget = new QWidget;
+  navWidget->setObjectName(QStringLiteral("nav"));
+  auto *navLayout = new QVBoxLayout(navWidget);
+  navLayout->setContentsMargins(0, 0, 0, 0);
+  navLayout->setSpacing(4);
+
+  m_nav = new QButtonGroup(this);
+  m_nav->setExclusive(true);
+  const auto addNav = [&](const QString &text, int index) {
+    auto *b = new QPushButton(text);
+    b->setObjectName(QStringLiteral("navItem"));
+    b->setCheckable(true);
+    b->setCursor(Qt::PointingHandCursor);
+    b->setFocusPolicy(Qt::NoFocus);
+    m_nav->addButton(b, index);
+    navLayout->addWidget(b);
+  };
+  addNav(tr("Connection"), 0);
+  addNav(tr("Activity"), 1);
+  addNav(tr("About"), 2);
+  navLayout->addStretch(1);
+  connect(m_nav, &QButtonGroup::idClicked, m_contentStack, &QStackedWidget::setCurrentIndex);
+  m_nav->button(0)->setChecked(true);
+
+  auto *brand = new QLabel(QStringLiteral("Deskflow"));
+  brand->setObjectName(QStringLiteral("brand"));
+
+  // App Center has no menu bar: move the menu actions into a sidebar button.
+  menuBar()->hide();
+  auto *menuButton = new QToolButton;
+  menuButton->setObjectName(QStringLiteral("menuButton"));
+  menuButton->setText(tr("Menu"));
+  menuButton->setIcon(QIcon::fromTheme(QStringLiteral("open-menu-symbolic")));
+  menuButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  menuButton->setPopupMode(QToolButton::InstantPopup);
+  menuButton->setCursor(Qt::PointingHandCursor);
+  auto *appMenu = new QMenu(menuButton);
+  appMenu->addAction(m_actionSettings);
+  appMenu->addSeparator();
+  appMenu->addAction(m_actionReportBug);
+  appMenu->addAction(m_actionClearSettings);
+  appMenu->addSeparator();
+  appMenu->addAction(m_actionQuit);
+  menuButton->setMenu(appMenu);
+
+  auto *sidebar = new QWidget;
+  sidebar->setObjectName(QStringLiteral("sidebar"));
+  sidebar->setFixedWidth(228);
+  auto *sv = new QVBoxLayout(sidebar);
+  sv->setContentsMargins(12, 18, 12, 12);
+  sv->setSpacing(16);
+  sv->addWidget(brand);
+  sv->addWidget(navWidget, 1);
+  sv->addWidget(menuButton);
+
+  auto *central = new QWidget;
+  central->setObjectName(QStringLiteral("shell"));
+  auto *h = new QHBoxLayout(central);
+  h->setContentsMargins(0, 0, 0, 0);
+  h->setSpacing(0);
+  h->addWidget(sidebar);
+  h->addWidget(m_contentStack, 1);
+
+  m_contentStack->setMinimumSize(560, 460);
+  setCentralWidget(central);
+  // restoreWindow() may have called setFixedSize() (old log-dock behaviour);
+  // undo that so the window is freely resizable, and set a comfortable default
+  // size once shown (an immediate resize gets overridden on show).
+  setMinimumSize(720, 480);
+  setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  resize(940, 620);
+  QTimer::singleShot(0, this, [this] {
+    setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    if (width() < 900 || height() < 600)
+      resize(940, 620);
+  });
+}
+
 MainWindow::~MainWindow()
 {
   // Stop network monitoring
@@ -574,13 +814,8 @@ void MainWindow::updateModeControlLabels()
   m_actionStopCore->setText(stopText);
   m_actionStopCore->setIcon(stopIcon);
 
-  if (isStarted) {
-    ui->btnToggleCore->setText(stopText);
-    ui->btnToggleCore->setIcon(stopIcon);
-  } else {
-    ui->btnToggleCore->setText(startText);
-    ui->btnToggleCore->setIcon(startIcon);
-  }
+  // Text-only button (no decorative icon); the tray/menu actions keep icons.
+  ui->btnToggleCore->setText(isStarted ? stopText : startText);
 }
 
 void MainWindow::updateSecurityIcon(bool visible)
@@ -988,6 +1223,29 @@ void MainWindow::coreConnectionStateChanged(ConnectionState state)
     secureSocket(false);
   } else if (isVisible()) {
     showFirstConnectedMessage();
+  }
+
+  notifyConnectionChange(state);
+  m_lastConnectionState = state;
+}
+
+void MainWindow::notifyConnectionChange(ConnectionState state)
+{
+  if (!m_trayIcon || !Settings::value(Settings::Gui::NotifyOnConnectionChange).toBool())
+    return;
+
+  // Only meaningful for a client tracking its link to the server.
+  if (m_coreProcess.mode() != Settings::CoreMode::Client)
+    return;
+
+  constexpr int kNotifyMs = 5000;
+
+  if (state == ConnectionState::Disconnected && m_lastConnectionState == ConnectionState::Connected) {
+    m_trayIcon->showMessage(tr("Deskflow"), tr("Disconnected from the server."), QSystemTrayIcon::Warning, kNotifyMs);
+    m_notifiedDisconnect = true;
+  } else if (state == ConnectionState::Connected && m_notifiedDisconnect) {
+    m_trayIcon->showMessage(tr("Deskflow"), tr("Reconnected to the server."), QSystemTrayIcon::Information, kNotifyMs);
+    m_notifiedDisconnect = false;
   }
 }
 

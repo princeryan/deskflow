@@ -1,0 +1,16 @@
+// SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+// SPDX-License-Identifier: MIT
+
+// Allow a local, active desktop session to start/stop/restart its own Deskflow
+// login-screen client service without a password prompt, so the Deskflow GUI
+// can act as a front-end for deskflow-uinput@<user>.service.
+//
+// Scoped to the caller's own instance: alice may manage
+// deskflow-uinput@alice.service, and nothing else.
+polkit.addRule(function (action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") == "deskflow-uinput@" + subject.user + ".service" &&
+        subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

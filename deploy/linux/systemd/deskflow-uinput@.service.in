@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-License-Identifier: MIT
+#
+# Login-screen capable Deskflow client, keyed by the username to run as.
+# Enable it for your account with, e.g.:
+#
+#     sudo systemctl enable --now deskflow-uinput@$USER.service
+#
+# The instance name (%i) is the local user whose ~/.config/Deskflow holds the
+# server address, screen name and TLS trust. The client injects input through
+# /dev/uinput (kernel evdev), so it keeps working at the GDM greeter and the
+# lock screen where the display-server backends have no session to talk to.
+#
+# Requirements (installed alongside this unit):
+#   - the udev rule grants /dev/uinput to group "input"
+#   - the user must be a member of the "input" group
+#   - the polkit rule lets an active session start/stop this unit password-less
+
+[Unit]
+Description=Deskflow login-screen client (uinput) for %i
+Documentation=https://github.com/deskflow/deskflow
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Run as the target user so the client reads that user's Deskflow config and
+# receives /dev/uinput via the "input" group -- never as root (a root instance
+# pollutes the system-wide single-instance shared memory).
+User=%i
+SupplementaryGroups=input
+Environment=DESKFLOW_UINPUT=1
+# Note on the clipboard socket: this system unit starts with no XDG_RUNTIME_DIR,
+# while the clipboard helper (a user service) binds its socket under the user's
+# runtime dir. The client derives the same path from getuid() (see
+# UInputClipboardBridge::socketPath), so no XDG_RUNTIME_DIR is set here -- and it
+# can't be, since systemd %U in a system unit is the manager UID (root), not User=%i.
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/deskflow-core client
+Restart=always
+RestartSec=3
+
+[Install]
+# multi-user.target is reached before the GDM greeter, so the client is
+# connected and able to inject by the time the login screen appears.
+WantedBy=multi-user.target

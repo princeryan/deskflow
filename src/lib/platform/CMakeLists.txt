@@ -32,6 +32,8 @@ if(WIN32)
     MSWindowsClipboardBitmapConverter.h
     MSWindowsClipboardFacade.cpp
     MSWindowsClipboardFacade.h
+    MSWindowsClipboardFileConverter.cpp
+    MSWindowsClipboardFileConverter.h
     MSWindowsClipboardHTMLConverter.cpp
     MSWindowsClipboardHTMLConverter.h
     MSWindowsClipboardUTF16Converter.cpp
@@ -109,6 +111,12 @@ elseif(UNIX)
     XDGPowerManager.h
     XDGKeyUtil.h
     XDGKeyUtil.cpp
+    UInputScreen.cpp
+    UInputScreen.h
+    UInputKeyState.cpp
+    UInputKeyState.h
+    UInputClipboardBridge.cpp
+    UInputClipboardBridge.h
   )
   if (BUILD_X11_SUPPORT)
     configure_file(XWindowsConfig.h.in XWindowsConfig.h @ONLY)

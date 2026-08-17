@@ -10,6 +10,68 @@ and work seamlessly between them.
 It's like a software KVM (but without the video).
 TLS encryption is enabled by default. Wayland is supported. Clipboard sharing is supported.
 
+> [!NOTE]
+> This is a fork of [Deskflow](https://github.com/deskflow/deskflow) with a few extra features. [**Jump to the download →**](#download-this-fork)
+
+## What's in this fork
+
+On top of Deskflow, this version adds:
+
+- **Control the login and lock screen too** — move between computers before you've signed in, not just after (Linux).
+- **Copy and paste files between computers**, not just text and pictures (Windows and Linux).
+- **A fresher look** that matches your system's light or dark theme, and can start automatically when you log in.
+- **Keeps working when your router changes the other computer's address** — optional on Linux, see [below](#when-your-router-keeps-changing-the-address-linux-only).
+
+## Download this fork
+
+Pick your computer:
+
+| Your computer | Download |
+|----|----|
+| **Windows** | [Download for Windows](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-win-x64.msi) |
+| **Mac** (Apple Silicon) | [Download for Mac](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-macos-arm64.dmg) |
+| **Linux** (Debian/Ubuntu) | [Download for Linux](https://github.com/princeryan/deskflow/releases/download/fork-continuous/deskflow-continuous-debian-trixie-x86_64.deb) |
+
+All files are also on the [downloads page](https://github.com/princeryan/deskflow/releases/tag/fork-continuous).
+
+### Installing
+
+- **Windows** — open the downloaded file and follow the prompts. If the app won't start, install the free [Microsoft Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe) and try again.
+- **Mac** — open the downloaded file and drag **Deskflow** into Applications. The first time, right-click the app and choose **Open** (it isn't signed by Apple, so a normal double-click is blocked).
+- **Linux** — open the downloaded file with your software installer, or run `sudo apt install ./deskflow-*-x86_64.deb` in a terminal.
+
+### Using it at the login screen (Linux only)
+
+This extra feature needs a quick one-time setup. Open a terminal and run:
+
+```sh
+sudo usermod -aG input $USER
+sudo systemctl enable --now deskflow-uinput@$USER.service
+systemctl --user enable --now deskflow-clipboard.service
+```
+
+Then log out and back in once. Set the other computer's address and a screen name in the app first.
+
+### When your router keeps changing the address (Linux only)
+
+Most home routers hand out addresses that change over time, so the address you typed into Deskflow can quietly stop working — the app sits there retrying against an address nobody answers on any more.
+
+If that happens to you, give the other computer a name instead of an address. Set the server in the app to:
+
+```
+deskflow-server
+```
+
+and turn on the helper that keeps that name pointing at the right place:
+
+```sh
+sudo systemctl enable --now deskflow-discover@$USER.timer
+```
+
+It stays completely idle while Deskflow is connected. Only when the connection is lost does it look around your network for the other computer, and if it has moved, it updates the name and reconnects you. There's nothing to configure.
+
+The tidier alternative, if you're comfortable in your router's settings, is to give the other computer a fixed address (often called a "DHCP reservation" or "static lease"). Then the address never changes and you don't need this at all.
+
 > [!TIP]
 >
 > **Chat with us**
@@ -18,7 +80,10 @@ TLS encryption is enabled by default. Wayland is supported. Clipboard sharing is
 > - Discussion also happens on IRC: `#deskflow` or `#deskflow-dev` on [Libera Chat](https://libera.chat/)
 > - Start a [new discussion](https://github.com/deskflow/deskflow/discussions) on our GitHub project.
 
-## Download
+## Download (original Deskflow)
+
+> [!NOTE]
+> The links below are for the **original Deskflow** and don't include this fork's extra features. For this fork, see [Download this fork](#download-this-fork) above.
 
 [![Downloads: Stable Release](https://img.shields.io/github/downloads/deskflow/deskflow/latest/total?style=for-the-badge&logo=github&label=Download%20Stable)](https://github.com/deskflow/deskflow/releases/latest)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Downloads: Continuous Build](https://img.shields.io/github/downloads/deskflow/deskflow/continuous/total?style=for-the-badge&logo=github&label=Download%20Continuous)](https://github.com/deskflow/deskflow/releases/continuous)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Download From Flathub](https://img.shields.io/flathub/downloads/org.deskflow.deskflow?style=for-the-badge&logo=flathub&label=Download%20from%20flathub)](https://flathub.org/apps/org.deskflow.deskflow)
 

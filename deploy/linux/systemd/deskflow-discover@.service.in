@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-License-Identifier: MIT
+#
+# Keeps the "deskflow-server" hostname pointed at the server's current address,
+# so a DHCP reshuffle or a renumbered network does not leave the client dialling
+# an address that no longer exists.
+#
+# Optional. Enable it for the same user as the client:
+#
+#     sudo systemctl enable --now deskflow-discover@$USER.timer
+#
+# and set the server to the name rather than an IP in ~/.config/Deskflow:
+#
+#     [client]
+#     remoteHost=deskflow-server
+#
+# It runs as root because it maintains /etc/hosts and restarts the client unit.
+# It does nothing at all while the client is connected -- see the script header.
+
+[Unit]
+Description=Deskflow server address discovery for %i
+Documentation=https://github.com/deskflow/deskflow
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=DESKFLOW_UNIT=deskflow-uinput@%i.service
+EnvironmentFile=-/etc/default/deskflow-discover
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/deskflow-discover

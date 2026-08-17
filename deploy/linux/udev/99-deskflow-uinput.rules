@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-License-Identifier: MIT
+
+# Deskflow: grant /dev/uinput to group "input" so the Deskflow client can
+# inject keyboard/mouse at the login/lock screen without running as root.
+# This is the one-time privilege the user grants to enable login-screen control.
+KERNEL=="uinput", SUBSYSTEM=="misc", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"

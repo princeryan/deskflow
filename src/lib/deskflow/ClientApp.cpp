@@ -37,6 +37,10 @@
 #include "platform/EiScreen.h"
 #endif
 
+#if defined(WINAPI_XWINDOWS) or defined(WINAPI_LIBEI)
+#include "platform/UInputScreen.h"
+#endif
+
 #if defined(Q_OS_MAC)
 #include "platform/OSXScreen.h"
 #endif
@@ -113,6 +117,14 @@ deskflow::Screen *ClientApp::createScreen()
       new OSXScreen(getEvents(), false, Settings::value(Settings::Client::LanguageSync).toBool()), getEvents()
   );
 #else
+#if defined(WINAPI_XWINDOWS) or defined(WINAPI_LIBEI)
+  // Headless kernel-level injection (works at the login/lock screen). Opt in
+  // via env var; wins over the display-server backends when set.
+  if (qEnvironmentVariableIsSet("DESKFLOW_UINPUT")) {
+    LOG_INFO("using uinput screen (headless evdev injection)");
+    return new deskflow::Screen(new deskflow::UInputScreen(false, getEvents()), getEvents());
+  }
+#endif
   if (deskflow::platform::isWayland()) {
 #if WINAPI_LIBEI
     LOG_INFO("using ei screen for wayland");
