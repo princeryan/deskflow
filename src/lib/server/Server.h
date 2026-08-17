@@ -253,6 +253,9 @@ private:
   // adjusts x and y or neither to avoid ending up in a jump zone
   // after entering the client in the given direction.
   void avoidJumpZone(const BaseClientProxy *, Direction, int32_t &x, int32_t &y) const;
+  //! Nudge an entry point on a secondary screen just inside the edge it came in
+  //! by, so a stray backwards pixel doesn't immediately switch us back.
+  void avoidSecondaryEntryEdge(const BaseClientProxy *, Direction, int32_t &x, int32_t &y) const;
 
   // test if a switch is permitted.  this includes testing user
   // options like switch delay and tracking any state required to

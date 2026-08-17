@@ -36,6 +36,16 @@
 
 using namespace deskflow::server;
 
+namespace {
+//! How far inside its entry edge the cursor lands on a secondary screen.
+/*!
+See Server::avoidSecondaryEntryEdge(). Large enough to survive the jitter of a
+hand that is still moving as the boundary is crossed, small enough that the
+step in is invisible and going back costs no perceptible extra travel.
+*/
+constexpr int32_t kSecondaryEntryMargin = 8;
+} // namespace
+
 //
 // Server
 //
@@ -720,8 +730,15 @@ BaseClientProxy *Server::mapToNeighbor(BaseClientProxy *src, Direction srcSide, 
 
 void Server::avoidJumpZone(const BaseClientProxy *dst, Direction dir, int32_t &x, int32_t &y) const
 {
-  // we only need to avoid jump zones on the primary screen
+  // Secondary screens have no jump zone: we track the cursor there by
+  // accumulating deltas, and the switch back fires the instant that total
+  // leaves the screen rectangle. Landing exactly on the entry edge therefore
+  // leaves no room at all -- a single pixel of backwards travel, which is
+  // ordinary hand jitter while pushing across a boundary, bounces straight
+  // back, and the pointer ends up flapping over the edge instead of crossing
+  // it. Step just inside the edge so a crossing has to be undone deliberately.
   if (dst != m_primaryClient) {
+    avoidSecondaryEntryEdge(dst, dir, x, y);
     return;
   }
 
@@ -757,6 +774,48 @@ void Server::avoidJumpZone(const BaseClientProxy *dst, Direction dir, int32_t &x
   case Bottom:
     if (!m_config->getNeighbor(dstName, Top, t, nullptr).empty() && y < dy + z)
       y = dy + z;
+    break;
+
+  case NoDirection:
+    assert(0 && "bad direction");
+  }
+}
+
+void Server::avoidSecondaryEntryEdge(const BaseClientProxy *dst, Direction dir, int32_t &x, int32_t &y) const
+{
+  int32_t dx;
+  int32_t dy;
+  int32_t dw;
+  int32_t dh;
+  dst->getShape(dx, dy, dw, dh);
+
+  // Small enough to be invisible, big enough to outlast the jitter of a hand
+  // still moving when the crossing happens. Never take more than a quarter of
+  // the screen, so a tiny one still behaves.
+  const auto margin = [](int32_t extent) { return std::min<int32_t>(kSecondaryEntryMargin, extent / 4); };
+  const int32_t mx = margin(dw);
+  const int32_t my = margin(dh);
+
+  switch (dir) {
+    using enum Direction;
+  case Left: // left the source leftwards, so we came in at the right edge
+    if (x > dx + dw - 1 - mx)
+      x = dx + dw - 1 - mx;
+    break;
+
+  case Right:
+    if (x < dx + mx)
+      x = dx + mx;
+    break;
+
+  case Top:
+    if (y > dy + dh - 1 - my)
+      y = dy + dh - 1 - my;
+    break;
+
+  case Bottom:
+    if (y < dy + my)
+      y = dy + my;
     break;
 
   case NoDirection:

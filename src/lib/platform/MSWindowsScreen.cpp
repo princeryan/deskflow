@@ -1230,10 +1230,10 @@ bool MSWindowsScreen::onMouseMove(int32_t mx, int32_t my)
     return true;
   }
 
-  // save position to compute delta of next motion
-  saveMousePosition(mx, my);
-
   if (m_isOnScreen) {
+    // save position to compute delta of next motion
+    saveMousePosition(mx, my);
+
     // motion on primary screen
     sendEvent(EventTypes::PrimaryScreenMotionOnPrimary, MotionInfo::alloc(m_xCursor, m_yCursor));
   } else {
@@ -1258,6 +1258,17 @@ bool MSWindowsScreen::onMouseMove(int32_t mx, int32_t my)
       // send motion
       sendEvent(EventTypes::PrimaryScreenMotionOnSecondary, MotionInfo::alloc(x, y));
     }
+
+    // The cursor is at the centre now, so that is what the next delta has to be
+    // measured from -- not the position this event reported. The PRE_WARP
+    // message posted by warpCursorNoFlush() says the same thing, but only once
+    // the queue reaches it, and the hook can dispatch a stale event first. When
+    // it does, recording that stale position here left the reference sitting
+    // where the cursor no longer was, so the *next* event became a large delta
+    // pointing back the way we came -- too small for the bogus-motion test
+    // above to catch, and enough to throw the pointer straight back over the
+    // screen edge it had just crossed.
+    saveMousePosition(m_xCenter, m_yCenter);
   }
 
   return true;
