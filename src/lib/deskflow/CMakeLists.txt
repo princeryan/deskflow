@@ -1,4 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2024 - 2025 Chris Rizzitello <sithlord48@gmail.com>
+# SPDX-FileCopyrightText: (C) 2026 Deskflow Developers
+# SPDX-FileCopyrightText: (C) 2024 - 2026 Chris Rizzitello <sithlord48@gmail.com>
 # SPDX-FileCopyrightText: (C) 2012 - 2025 Symless Ltd
 # SPDX-FileCopyrightText: (C) 2009 - 2012 Nick Bolton
 # SPDX-License-Identifier: MIT
@@ -18,8 +19,8 @@ elseif(UNIX)
     unix/DeskflowXkbKeyboard.cpp
     unix/DeskflowXkbKeyboard.h
     unix/ISO639Table.h
-    unix/X11LayoutsParser.cpp
-    unix/X11LayoutsParser.h
+    unix/XkbLayoutsParser.cpp
+    unix/XkbLayoutsParser.h
   )
 endif()
 
@@ -89,26 +90,14 @@ add_library(${lib_name} STATIC ${PLATFORM_CODE}
   ipc/CoreIpcServer.h
 )
 
-target_link_libraries(${lib_name} PUBLIC common Qt6::Core Qt6::Network)
-
-if(WIN32)
-  target_link_libraries(${lib_name} PRIVATE platform)
-endif()
-
-if(UNIX)
-  target_link_libraries(
-    ${lib_name}
-    PRIVATE
-    arch
-    client
-    net
-    base
+target_link_libraries(${lib_name}
+  PUBLIC
+    common
+    Qt6::Network
+  PRIVATE
     platform
-    mt
-    server
-  )
+)
 
-  if(NOT APPLE)
-    target_link_libraries(${lib_name} PRIVATE Qt6::Xml)
-  endif()
+if(UNIX AND NOT APPLE)
+  target_link_libraries(${lib_name} PRIVATE server ${LIBXKBREGISTRY_LINK_LIBRARIES})
 endif()

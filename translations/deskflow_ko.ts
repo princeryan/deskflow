@@ -166,22 +166,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">규모</translation>
     </message>
     <message>
-        <source>Close and save changes</source>
-        <translation>변경 사항 저장 후 닫기</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>저장하지 않고 닫기</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">저장된 값으로 재설정</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">기본값으로 재설정</translation>
-    </message>
-    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the client to slow the rate it attempts to reconnect to the server when connections attempts are failing. The delay between connection attempts will  start at 1 second intervals and can be a maxium of 5 minutes between connection attempts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;연결 시도가 실패할 경우, 클라이언트가 서버 재연결 시도 주기를 늦추도록 허용합니다. 연결 시도 간 지연 시간은 1초 간격으로 시작되며, 최대 5분까지 늘어날 수 있습니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -268,6 +252,17 @@ Do you want to connect to the server?
     <message>
         <source>Invalid hash format</source>
         <translation>잘못된 해시 형식</translation>
+    </message>
+</context>
+<context>
+    <name>HelpDialog</name>
+    <message>
+        <source>%1 Help</source>
+        <translation type="unfinished">%1 도움말</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">닫다</translation>
     </message>
 </context>
 <context>
@@ -422,6 +417,10 @@ Do you want to connect to the server?
         <translation>&lt;p&gt;서버 &apos;%1&apos;에 연결하지 못했습니다.&lt;/p&gt;&lt;p&gt;같은 이름의 클라이언트가 이미 서버에 연결되어 있습니다.&lt;/p&gt;&lt;p&gt;고유한 이름을 사용하고, 클라이언트 프로세스가 하나만 실행 중인지 확인하세요.&lt;/p&gt;</translation>
     </message>
     <message>
+        <source>View &amp;Help</source>
+        <translation type="unfinished">도움말 보기(&amp;H)</translation>
+    </message>
+    <message>
         <source>No IP Detected</source>
         <translation>IP를 감지하지 못했습니다</translation>
     </message>
@@ -466,14 +465,6 @@ A bound IP is now invalid, you may need to restart the server.</source>
     <message>
         <source>&amp;Help</source>
         <translation>도움말(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Clear settings</source>
-        <translation>설정 초기화</translation>
-    </message>
-    <message>
-        <source>Report a Bug</source>
-        <translation>버그 신고</translation>
     </message>
     <message>
         <source>&amp;Minimize to tray</source>
@@ -692,22 +683,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
     <message>
         <source>A new client called &apos;%1&apos; wants to connect</source>
         <translation>새 클라이언트 &apos;%1&apos;이(가) 연결을 요청합니다</translation>
-    </message>
-    <message>
-        <source>%1 Clear Settings</source>
-        <translation>%1 설정 초기화</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt;&lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;모든 설정을 초기화하고 %1을(를) 재시작할까요?&lt;/p&gt;&lt;p&gt;이 작업은 번복될 수 없습니다.&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1 Read-only settings</source>
-        <translation>%1 읽기 전용 설정</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Settings are read-only because you only have read access to the file:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</source>
-        <translation>&lt;p&gt;다음 파일에 대한 쓰기 권한이 없어 설정이 읽기 전용입니다:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</translation>
     </message>
     <message>
         <source>No thanks</source>
@@ -1057,14 +1032,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
         <translation>지정 시간 내 더블 탭으로 전환(&amp;T)</translation>
     </message>
     <message>
-        <source>Config file</source>
-        <translation>설정 파일</translation>
-    </message>
-    <message>
-        <source>Core server config file</source>
-        <translation>코어 서버 설정 파일</translation>
-    </message>
-    <message>
         <source>Use a server config file to create complex computer layouts that are not possible with the simple grid-based computer layout editor.
 
 Enabling this setting will disable the server config GUI.</source>
@@ -1193,6 +1160,14 @@ Enabling this setting will disable the server config GUI.</source>
         <translation>로그 파일 저장 위치...</translation>
     </message>
     <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 설정 초기화</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;모든 설정을 지우고 %1을(를) 다시 시작하시겠습니까?&lt;/p&gt; &lt;p&gt;이 작업은 되돌릴 수 없습니다.&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Required messages</source>
         <translation>필수 메시지</translation>
     </message>
@@ -1215,22 +1190,6 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Verbose debug output</source>
         <translation>상세 디버그 출력</translation>
-    </message>
-    <message>
-        <source>Close and save changes</source>
-        <translation>변경 사항 저장 후 닫기</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>저장하지 않고 닫기</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">저장된 값으로 재설정</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">기본값으로 재설정</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -1291,6 +1250,37 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
         <translation type="unfinished">Info보다 높은 로그 레벨을 사용하면 성능에 영향을 미칠 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Remove all settings</source>
+        <translation type="unfinished">모든 설정 제거</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialogButtonBox</name>
+    <message>
+        <source>Settings are read only</source>
+        <translation type="unfinished">설정은 읽기 전용입니다</translation>
+    </message>
+    <message>
+        <source>%1 is not writable</source>
+        <translation type="unfinished">%1은(는) 쓰기 가능하지 않습니다</translation>
+    </message>
+    <message>
+        <source>Close and save changes</source>
+        <translation type="unfinished">변경 사항 저장 후 닫기</translation>
+    </message>
+    <message>
+        <source>Close and forget changes</source>
+        <translation type="unfinished">저장하지 않고 닫기</translation>
+    </message>
+    <message>
+        <source>Reset to stored values</source>
+        <translation type="unfinished">저장된 값으로 재설정</translation>
+    </message>
+    <message>
+        <source>Reset to default values</source>
+        <translation type="unfinished">기본값으로 재설정</translation>
     </message>
 </context>
 <context>

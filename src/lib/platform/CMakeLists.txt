@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: (C) 2024 Chris Rizzitello <sithlord48@gmail.com>
+# SPDX-FileCopyrightText: (C) 2024 - 2026 Chris Rizzitello <sithlord48@gmail.com>
 # SPDX-FileCopyrightText: (C) 2012 - 2024 Symless Ltd
 # SPDX-FileCopyrightText: (C) 2009 - 2012 Nick Bolton
 # SPDX-License-Identifier: MIT
@@ -14,8 +14,8 @@ if(UNIX AND NOT APPLE)
   include(CMakePushCheckState)
   include(CheckSymbolExists)
   cmake_push_check_state(RESET)
-  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${LIBPORTAL_INCLUDE_DIRS};${GLIB2_INCLUDE_DIRS}")
-  set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};${LIBPORTAL_LINK_LIBRARIES};${GLIB2_LINK_LIBRARIES}")
+  set(CMAKE_REQUIRED_INCLUDES "${CMAKE_REQUIRED_INCLUDES};${LIBPORTAL_INCLUDE_DIRS};")
+  set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES};${LIBPORTAL_LINK_LIBRARIES};")
   check_symbol_exists(xdp_input_capture_session_get_restore_token "libportal/inputcapture.h" HAVE_IC_RESTORE)
   check_symbol_exists(xdp_session_request_clipboard "libportal/portal-helpers.h;libportal/clipboard.h" HAVE_LP_CLIPBOARD)
   cmake_pop_check_state()
@@ -86,6 +86,8 @@ elseif(APPLE)
     OSXCocoaApp.m
     OSXEventQueueBuffer.cpp
     OSXEventQueueBuffer.h
+    OSXKeyLayoutResource.cpp
+    OSXKeyLayoutResource.h
     OSXKeyState.cpp
     OSXKeyState.h
     OSXMediaKeySupport.h
@@ -101,8 +103,6 @@ elseif(APPLE)
     OSXScreenSaverControl.h
     OSXScreenSaverUtil.h
     OSXScreenSaverUtil.m
-    OSXUchrKeyResource.cpp
-    OSXUchrKeyResource.h
   )
 elseif(UNIX)
   set(PLATFORM_SOURCES
@@ -181,20 +181,14 @@ endif()
 # wayland.h is included to check for wayland support
 add_library(platform STATIC ${PLATFORM_SOURCES})
 
-target_link_libraries(platform client ${libs})
+target_link_libraries(platform PUBLIC client ${libs})
 
 if(UNIX)
-  target_link_libraries(
-    platform
-    io
-    net
-    app
-    client
-    ${libs})
+  target_link_libraries(platform PRIVATE net app)
 
   if(APPLE)
     find_library(COCOA_LIBRARY Cocoa)
-    target_link_libraries(platform ${COCOA_LIBRARY})
+    target_link_libraries(platform PUBLIC ${COCOA_LIBRARY})
   else()
     if(${LIBXKBCOMMON_VERSION} VERSION_GREATER_EQUAL "1.10")
       target_compile_definitions(platform PRIVATE HAVE_XKB_KEYMAP_MOD_GET_MASK=1)
@@ -207,12 +201,12 @@ if(UNIX)
       target_compile_definitions(platform PUBLIC HAVE_LIBPORTAL_CLIPBOARD)
     endif()
     target_include_directories(platform PUBLIC ${LIBEI_INCLUDE_DIRS} ${LIBPORTAL_INCLUDE_DIRS})
-    target_link_libraries(
-      platform
-      Qt6::DBus
-      Qt6::Gui
-      ${LIBXKBCOMMON_LINK_LIBRARIES}
-      ${GLIB2_LINK_LIBRARIES} ${LIBM_LIBRARIES}
-      ${LIBEI_LINK_LIBRARIES} ${LIBPORTAL_LINK_LIBRARIES})
+    target_link_libraries(platform
+      PUBLIC
+        Qt6::DBus
+      PRIVATE
+        Qt6::Gui
+        ${LIBXKBCOMMON_LINK_LIBRARIES}
+        ${LIBEI_LINK_LIBRARIES} ${LIBPORTAL_LINK_LIBRARIES})
   endif()
 endif()

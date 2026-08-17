@@ -166,22 +166,6 @@ p, li { white-space: pre-wrap; }
         <translation>倍率</translation>
     </message>
     <message>
-        <source>Close and save changes</source>
-        <translation>変更を保存して閉じる</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>変更を破棄して閉じる</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation>変更前の値にリセットする</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation>デフォルト値にリセットする</translation>
-    </message>
-    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the client to slow the rate it attempts to reconnect to the server when connections attempts are failing. The delay between connection attempts will  start at 1 second intervals and can be a maxium of 5 minutes between connection attempts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;接続試行が失敗し続けている場合に、クライアントがサーバーへ再接続を試みる頻度を徐々に下げます。接続試行の間隔は当初1秒から開始され、最大で5分まで延長されます。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -268,6 +252,17 @@ Do you want to connect to the server?
     <message>
         <source>Invalid hash format</source>
         <translation>不正なハッシュ形式</translation>
+    </message>
+</context>
+<context>
+    <name>HelpDialog</name>
+    <message>
+        <source>%1 Help</source>
+        <translation type="unfinished">%1 ヘルプ</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">近い</translation>
     </message>
 </context>
 <context>
@@ -422,6 +417,10 @@ Do you want to connect to the server?
         <translation>&lt;p&gt;サーバー &apos;%1&apos; への接続に失敗しました。&lt;/p&gt;&lt;p&gt;同じ名前のクライアントがサーバーに接続済です。&lt;/p&gt;&lt;p&gt;名前の重複がないことと、クライアントプロセスが多重起動していない事を確認してください。&lt;/p&gt;</translation>
     </message>
     <message>
+        <source>View &amp;Help</source>
+        <translation type="unfinished">ヘルプを表示 (&amp;H)</translation>
+    </message>
+    <message>
         <source>No IP Detected</source>
         <translation>IPアドレスが見つかりません</translation>
     </message>
@@ -466,14 +465,6 @@ A bound IP is now invalid, you may need to restart the server.</source>
     <message>
         <source>&amp;Help</source>
         <translation>ヘルプ(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Clear settings</source>
-        <translation>設定を消去</translation>
-    </message>
-    <message>
-        <source>Report a Bug</source>
-        <translation>バグレポート</translation>
     </message>
     <message>
         <source>&amp;Minimize to tray</source>
@@ -694,22 +685,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
     <message>
         <source>A new client called &apos;%1&apos; wants to connect</source>
         <translation>新しいクライアント &apos;%1&apos; が接続を求めています</translation>
-    </message>
-    <message>
-        <source>%1 Clear Settings</source>
-        <translation>%1 設定消去</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt;&lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;全ての設定を消去して %1 を再起動しますか？&lt;/p&gt;&lt;p&gt;この操作は取り消せません。&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1 Read-only settings</source>
-        <translation>%1 読み取り専用設定</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Settings are read-only because you only have read access to the file:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</source>
-        <translation>&lt;p&gt;以下のファイルへの書き込み権限がないため、設定は読み取り専用です:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</translation>
     </message>
     <message>
         <source>No thanks</source>
@@ -1059,14 +1034,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
         <translation>指定時間内に画面端ダブルタップで移動(&amp;T)</translation>
     </message>
     <message>
-        <source>Config file</source>
-        <translation>設定ファイル</translation>
-    </message>
-    <message>
-        <source>Core server config file</source>
-        <translation>Coreサーバー設定ファイル</translation>
-    </message>
-    <message>
         <source>Use a server config file to create complex computer layouts that are not possible with the simple grid-based computer layout editor.
 
 Enabling this setting will disable the server config GUI.</source>
@@ -1195,6 +1162,14 @@ Enabling this setting will disable the server config GUI.</source>
         <translation>ログをファイルに保存…</translation>
     </message>
     <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 設定消去</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;すべての設定を消去して %1 を再起動してもよろしいですか？&lt;/p&gt; &lt;p&gt;この操作は元に戻せません。&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Required messages</source>
         <translation>必須のメッセージ</translation>
     </message>
@@ -1217,22 +1192,6 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Verbose debug output</source>
         <translation>詳細なデバッグ出力</translation>
-    </message>
-    <message>
-        <source>Close and save changes</source>
-        <translation>変更を保存して閉じる</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>変更を破棄して閉じる</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation>変更前の値にリセットする</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation>デフォルト値にリセットする</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -1293,6 +1252,37 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
         <translation>Infoよりも高いログレベルを使用すると、パフォーマンスに影響を及ぼす可能性があります。</translation>
+    </message>
+    <message>
+        <source>Remove all settings</source>
+        <translation type="unfinished">すべての設定を削除する</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialogButtonBox</name>
+    <message>
+        <source>Settings are read only</source>
+        <translation type="unfinished">設定は読み取り専用です</translation>
+    </message>
+    <message>
+        <source>%1 is not writable</source>
+        <translation type="unfinished">%1 は書き込み可能ではありません</translation>
+    </message>
+    <message>
+        <source>Close and save changes</source>
+        <translation type="unfinished">変更を保存して閉じる</translation>
+    </message>
+    <message>
+        <source>Close and forget changes</source>
+        <translation type="unfinished">変更を破棄して閉じる</translation>
+    </message>
+    <message>
+        <source>Reset to stored values</source>
+        <translation type="unfinished">変更前の値にリセットする</translation>
+    </message>
+    <message>
+        <source>Reset to default values</source>
+        <translation type="unfinished">デフォルト値にリセットする</translation>
     </message>
 </context>
 <context>

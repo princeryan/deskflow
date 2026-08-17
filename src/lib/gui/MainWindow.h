@@ -13,6 +13,7 @@
 #include <QProcess>
 #include <QRegularExpression>
 #include <QSystemTrayIcon>
+#include <QUrl>
 
 #include "VersionChecker.h"
 #include "config/ServerConfig.h"
@@ -109,13 +110,11 @@ private:
   void notifyConnectionChange(ConnectionState state);
   void coreProcessStateChanged(ProcessState state);
 
-
   void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
   void serverConnectionConfigureClient(const QString &clientName);
 
   void clearSettings();
   void openAboutDialog();
-  void openHelpUrl() const;
   void openGetNewVersionUrl() const;
   void openSettings();
   void startCore();
@@ -141,10 +140,11 @@ private:
   void handlePeerFingerprint(const QString &fingerprint);
   void handleMissingKeyboardLayouts(const QString &layouts);
   void closeEvent(QCloseEvent *event) override;
+  bool maybeHideToTray();
   void secureSocket(bool secureSocket);
   void connectSlots();
   void handleLogLine(const QString &line);
-  void updateLocalFingerprint();
+  void updateFingerprintButton();
   void updateScreenName();
   void saveSettings() const;
   void showConfigureServer(const QString &message);
@@ -161,6 +161,8 @@ private:
   void remoteHostChanged(const QString &newRemoteHost);
   void updateIpLabel(const QStringList &addresses);
   void updateTimeoutDelay(int newDelay);
+  void setHelpFilePath();
+  void showHelpViewer() const;
 
   bool canRunCore() const;
 
@@ -216,8 +218,6 @@ private:
 
   // Window Actions
   QAction *m_actionAbout = nullptr;
-  QAction *m_actionClearSettings = nullptr;
-  QAction *m_actionReportBug = nullptr;
   QAction *m_actionMinimize = nullptr;
   QAction *m_actionQuit = nullptr;
   QAction *m_actionTrayQuit = nullptr;
@@ -226,6 +226,7 @@ private:
   QAction *m_actionStartCore = nullptr;
   QAction *m_actionRestartCore = nullptr;
   QAction *m_actionStopCore = nullptr;
+  QAction *m_actionShowHelp = nullptr;
 
   // Network monitoring
   NetworkMonitor *m_networkMonitor = nullptr;
@@ -234,4 +235,5 @@ private:
   // Server IP strategy optimization
   QStringList m_serverStartIPs;
   QString m_serverStartSuggestedIP;
+  QUrl m_helpPath;
 };

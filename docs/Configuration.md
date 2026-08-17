@@ -2,7 +2,6 @@
 
  Deskflow will automatically figure out where to save settings and other files.
 
-
 ## Search paths
 
 Deskflow will look for settings in several places depending on your operating system.
@@ -59,7 +58,6 @@ It will begin with `[client]`
 | xScrollScale              | Double 0.1 - 10.0  | Horizontal mouse scrolling will be scaled by this amount on the client [default: 1.0] |
 | invertYScroll             | `true` or `false`  | Invert vertical scroll on this client [default: false] |
 | invertXScroll             | `true` or `false`  | Invert horizontal scroll on this client [default: false] |
-| xdpRestoreToken           | UUID               | Restore token provided by XDG portals |
 
 ### Core
 
@@ -105,7 +103,6 @@ This section contains options used by the GUI it will begin with `[gui]`
 | closeToTray                    | `true` or `false` | When `true` the gui will run in the systemTray when its closed [default: true] |
 | logExpanded                    | `true` or `false` | Should the log section of the GUI be opened [default: false] |
 | symbolicTrayIcon               | `true` or `false` | When true use the monocolor (symbolic) icon false uses a colorful icon for the tray [default: true] |
-| windowGeometry                 | QRect             | Geometry of the window used to restore the window geometry after exiting the app |
 | showGenericClientFailureDialog | `true` or `false` | When `true` client connection errors will not show popup error messages [default: true] |
 | shownFirstConnectedMessage     | `true` or `false` | When `true` GUI has shown the user the message for connecting the first time [default: false] |
 | shownServerFirstStartMessage   | `true` or `false` | When `true` GUI has shown the user the Deskflow server is now running message [default: false] |
@@ -158,7 +155,6 @@ This section contains options used when in server mode it will begin with `[serv
 | switchDelay        | int               | Deskflow won't switch computers when the mouse reaches edge of a computer unless it stays on the edge for `N` milliseconds. This helps prevent unintentional switching when working near an edge. (default: 250)|
 | switchDoubleTap    | int               | Deskflow won't switch computers when the mouse reaches the edge of a computer unless it's moved away from the edge and then back to the edge within `N` milliseconds. With the option you have to quickly tap the edge twice to switch. This helps prevent unintentional switching when working near the edge.|
 |win32KeepForeground | `true` or `false` | If set to ''true'' (the default), Deskflow will grab the foreground focus on a Windows server (thereby putting all other windows in the background) upon switching to a client. If set to ''false'', it will leave the currently foreground window in the foreground. Deskflow grabs the focus to avoid issues with other apps interfering with Deskflow's ability to read the hardware inputs. |
-| xdpRestoreToken   | UUID               | Restore token provided by XDG portals |
 
  - You can use both the ''switchDelay'' and ''switchDoubleTap'' options at the same time. Deskflow will switch when either requirement is satisfied.
 
@@ -322,13 +318,14 @@ This declares three computers named ''moe'', ''larry'', and ''curly''. Computer 
 #### screen options
 
 A computer can have the following options:
+
 |Option | Valid Values| Description|
 |:----------|:-----------:|:-----------|
 |halfDuplexCapsLock| `true` or `false` | This computer has a ''Caps Lock'' key that doesn't report a press and a release event when the user presses it but instead reports a press event when it's turned on and a release event when it's turned off. If ''Caps Lock'' acts strangely on all computers then you may need to set this option to true on the server. If it acts strangely on one computer then that computer may need the option set to true.|
 |halfDuplexNumLock | `true` or `false` | This computer has a ''Num Lock'' key that doesn't report a press and a release event when the user presses it but instead reports a press event when it's turned on and a release event when it's turned off. If ''Num Lock'' acts strangely on all computers then you may need to set this option to true on the server. If it acts strangely on one computer then that computer may need the option set to true.|
 |halfDuplexScrollLock| `true` or `false`| This computer has a ''Scroll Lock'' key that doesn't report a press and a release event when the user presses it but instead reports a press event when it's turned on and a release event when it's turned off. If ''Scroll Lock'' acts strangely on all computers then you may need to set this option to true on the server. If it acts strangely on one computer then that computer may need the option set to true.|
 |xtestIsXineramaUnaware| `true` or `false`| This option works around a bug in the XTest extension when used in combination with Xinerama. It affects X11 clients only. Not all versions of the XTest extension are aware of the Xinerama extension. As a result, they do not move the mouse correctly when using multiple Xinerama screens. This option is currently ''true'' by default. If you know your XTest extension is Xinerama aware then set this option to ''false''.|
-|preserveFocus| `true` or `false` | When true don't drop focus when switching computers
+|preserveFocus| `true` or `false` | When true don't drop focus when switching computers|
 |switchCorners | none top-left top-right bottom-left bottom-right left right top bottom all | Deskflow won't switch computers when the mouse reaches the edge of the computer if it's in a listed corner. The size of all corners is given by the `switchCornerSize` option. The first name in the list is one of the above names and defines the initial set of corners. Subsequent names are prefixed with + or - to add the corner to or remove the corner from the set, respectively. For example: `all -left +top-left` starts will all corners, removes the left corners (top and bottom) then adds the top-left back in, resulting in the top-left, bottom-left and bottom-right corners.|
 |switchCornerSize | integer (N) | Sets the size of all corners in pixels. The cursor must be within `N` pixels of the corner to be considered to be in the corner.|
 |shift | shift ctrl alt meta super none | Map the server's shift modifer to different key on a client computer|
@@ -422,7 +419,6 @@ Actions are two lists of individual actions separated by commas. The two lists a
 ##### Keynames
 Valid key names are:
 
-<details><summary>Valid Key Names</summary>
 * AppMail
 * AppMedia
 * AppUser1
@@ -580,7 +576,6 @@ Valid key names are:
 * Bar
 * BraceR
 * Tilde
-</details>
 
 Additionally, a name of the form `\uXXXX` where ''XXXX'' is a hexadecimal number is interpreted as a unicode character code. Key and modifier names are case-insensitive. Keys that don't exist on the keyboard or in the default keyboard layout will not work.
 

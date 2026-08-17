@@ -166,22 +166,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">规模</translation>
     </message>
     <message>
-        <source>Close and save changes</source>
-        <translation type="unfinished">关闭并保存更改</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>关闭并放弃修改</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">重置为存储值</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">重置为默认值</translation>
-    </message>
-    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the client to slow the rate it attempts to reconnect to the server when connections attempts are failing. The delay between connection attempts will  start at 1 second intervals and can be a maxium of 5 minutes between connection attempts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;允许客户端在连接尝试失败时，降低其重连服务器的频率。连接尝试之间的间隔将从 1 秒开始，最长可达 5 分钟。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -268,6 +252,17 @@ Do you want to connect to the server?
     <message>
         <source>Invalid hash format</source>
         <translation>无效的哈希格式</translation>
+    </message>
+</context>
+<context>
+    <name>HelpDialog</name>
+    <message>
+        <source>%1 Help</source>
+        <translation type="unfinished">%1 帮助</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">关闭</translation>
     </message>
 </context>
 <context>
@@ -422,6 +417,10 @@ Do you want to connect to the server?
         <translation>&lt;p&gt;连接到服务器“%1”失败。&lt;/p&gt;&lt;p&gt;一个同名的客户端已连接到服务器。&lt;/p&gt;请确保您使用的名称唯一，且只有一个客户端进程实例在运行。&lt;/p&gt;</translation>
     </message>
     <message>
+        <source>View &amp;Help</source>
+        <translation type="unfinished">查看帮助(&amp;H)</translation>
+    </message>
+    <message>
         <source>No IP Detected</source>
         <translation>未检测到 IP</translation>
     </message>
@@ -466,14 +465,6 @@ A bound IP is now invalid, you may need to restart the server.</source>
     <message>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
-    </message>
-    <message>
-        <source>Clear settings</source>
-        <translation>清除设置</translation>
-    </message>
-    <message>
-        <source>Report a Bug</source>
-        <translation>报告 Bug</translation>
     </message>
     <message>
         <source>&amp;Minimize to tray</source>
@@ -694,22 +685,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
     <message>
         <source>A new client called &apos;%1&apos; wants to connect</source>
         <translation>名为“%1”的新客户端请求连接</translation>
-    </message>
-    <message>
-        <source>%1 Clear Settings</source>
-        <translation>%1 清除设置</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt;&lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;您确定要清除所有设置并重启 %1 吗？&lt;/p&gt;&lt;p&gt;此操作无法撤销。&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1 Read-only settings</source>
-        <translation>%1 只读设置</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Settings are read-only because you only have read access to the file:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</source>
-        <translation>&lt;p&gt;设置是只读的，因为您对该文件只有读取权限：&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</translation>
     </message>
     <message>
         <source>No thanks</source>
@@ -1059,14 +1034,6 @@ Additionally, check you are able to %1 the server config file: %2</source>
         <translation>在指定时间内双击切换(&amp;T)</translation>
     </message>
     <message>
-        <source>Config file</source>
-        <translation>配置文件</translation>
-    </message>
-    <message>
-        <source>Core server config file</source>
-        <translation>核心服务器配置文件</translation>
-    </message>
-    <message>
         <source>Use a server config file to create complex computer layouts that are not possible with the simple grid-based computer layout editor.
 
 Enabling this setting will disable the server config GUI.</source>
@@ -1195,6 +1162,14 @@ Enabling this setting will disable the server config GUI.</source>
         <translation>保存日志文件到...</translation>
     </message>
     <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 清除设置</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;您确定要清除所有设置并重新启动 %1 吗？&lt;/p&gt; &lt;p&gt;此操作无法撤销。&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Required messages</source>
         <translation>必要消息</translation>
     </message>
@@ -1217,22 +1192,6 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Verbose debug output</source>
         <translation>详细调试输出</translation>
-    </message>
-    <message>
-        <source>Close and save changes</source>
-        <translation type="unfinished">关闭并保存更改</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation>关闭并放弃修改</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">重置为存储值</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">重置为默认值</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -1293,6 +1252,37 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
         <translation type="unfinished">使用高于 Info 级别的日志级别可能会影响性能。</translation>
+    </message>
+    <message>
+        <source>Remove all settings</source>
+        <translation type="unfinished">移除所有设置</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialogButtonBox</name>
+    <message>
+        <source>Settings are read only</source>
+        <translation type="unfinished">设置仅为只读</translation>
+    </message>
+    <message>
+        <source>%1 is not writable</source>
+        <translation type="unfinished">%1 不可写入</translation>
+    </message>
+    <message>
+        <source>Close and save changes</source>
+        <translation type="unfinished">关闭并保存更改</translation>
+    </message>
+    <message>
+        <source>Close and forget changes</source>
+        <translation type="unfinished">关闭并放弃修改</translation>
+    </message>
+    <message>
+        <source>Reset to stored values</source>
+        <translation type="unfinished">重置为存储值</translation>
+    </message>
+    <message>
+        <source>Reset to default values</source>
+        <translation type="unfinished">重置为默认值</translation>
     </message>
 </context>
 <context>

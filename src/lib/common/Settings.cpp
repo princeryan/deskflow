@@ -12,6 +12,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QFileSystemWatcher>
 #include <QRect>
 #include <QRegularExpression>
 #include <QStandardPaths>
@@ -32,7 +33,9 @@ void Settings::setSettingsFile(const QString &settingsFile)
   if (instance()->m_settings)
     instance()->m_settings->deleteLater();
 
+  instance()->m_settingsWatcher->removePath(instance()->m_settings->fileName());
   instance()->m_settings = new QSettings(settingsFile, QSettings::IniFormat, instance());
+  instance()->m_settingsWatcher->addPath(settingsFile);
   instance()->m_settingsProxy->load(settingsFile);
   qInfo().noquote() << "settings file changed:" << instance()->m_settings->fileName();
 
@@ -40,6 +43,7 @@ void Settings::setSettingsFile(const QString &settingsFile)
   instance()->cleanSettings();
   instance()->cleanStateSettings();
   instance()->setupComputerName();
+  instance()->checkIfSettingsWritableChange();
 }
 
 void Settings::setStateFile(const QString &stateFile)
@@ -56,7 +60,7 @@ void Settings::setStateFile(const QString &stateFile)
   qInfo().noquote() << "state file changed:" << instance()->m_stateSettings->fileName();
 }
 
-Settings::Settings(QObject *parent) : QObject(parent)
+Settings::Settings(QObject *parent) : QObject(parent), m_settingsWatcher{new QFileSystemWatcher(this)}
 {
   QString fileToLoad;
 #ifdef Q_OS_WIN
@@ -76,6 +80,9 @@ Settings::Settings(QObject *parent) : QObject(parent)
     fileToLoad = UserSettingFile;
 
   m_settings = new QSettings(fileToLoad, QSettings::IniFormat, this);
+  m_settingsWritable = m_settings->isWritable();
+  m_settingsWatcher->addPath(m_settings->fileName());
+  connect(m_settingsWatcher, &QFileSystemWatcher::fileChanged, this, &Settings::checkIfSettingsWritableChange);
   m_settingsProxy = std::make_shared<QSettingsProxy>();
   m_settingsProxy->load(fileToLoad);
   qInfo().noquote() << "initial settings file:" << m_settings->fileName();
@@ -167,6 +174,19 @@ QString Settings::cleanComputerName(const QString &name)
   return cleanName;
 }
 
+void Settings::checkIfSettingsWritableChange()
+{
+  if (!instance()->m_settingsWatcher->files().contains(Settings::settingsFile()))
+    m_settingsWatcher->addPath(Settings::settingsFile());
+
+  bool writable = Settings::isWritable();
+  if (writable == m_settingsWritable)
+    return;
+  qDebug() << QString("Setting are now %1").arg(writable ? "writable" : "readonly");
+  instance()->m_settingsWritable = writable;
+  Q_EMIT instance()->settingsWritableChanged(writable);
+}
+
 QVariant Settings::defaultValue(const QString &key)
 {
   if (m_defaultFalseValues.contains(key))
@@ -246,6 +266,8 @@ NetworkProtocol Settings::networkProtocol()
 
 void Settings::save(bool emitSaving)
 {
+  if (!Settings::isWritable())
+    qWarning().noquote() << "settings not saved, file is read-only:" << Settings::settingsFile();
   if (emitSaving)
     Q_EMIT instance()->serverSettingsChanged();
   instance()->m_settings->sync();

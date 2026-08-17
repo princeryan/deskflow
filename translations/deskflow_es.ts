@@ -166,22 +166,6 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">Escala</translation>
     </message>
     <message>
-        <source>Close and save changes</source>
-        <translation type="unfinished">Cerrar y guardar los cambios</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation type="unfinished">Cerrar y olvidar los cambios</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">Restablecer los valores almacenados</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">Restablecer valores predeterminados</translation>
-    </message>
-    <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Allow the client to slow the rate it attempts to reconnect to the server when connections attempts are failing. The delay between connection attempts will  start at 1 second intervals and can be a maxium of 5 minutes between connection attempts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Permite que el cliente reduzca la frecuencia con la que intenta reconectarse al servidor cuando los intentos de conexión fallan. El intervalo entre intentos de conexión comenzará en 1 segundo y podrá alcanzar un máximo de 5 minutos.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -268,6 +252,17 @@ Do you want to connect to the server?
     <message>
         <source>Invalid hash format</source>
         <translation type="unfinished">Formato hash no válido</translation>
+    </message>
+</context>
+<context>
+    <name>HelpDialog</name>
+    <message>
+        <source>%1 Help</source>
+        <translation type="unfinished">%1 Ayuda</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Cerca</translation>
     </message>
 </context>
 <context>
@@ -370,14 +365,6 @@ Do you want to connect to the server?
         <translation type="unfinished">Reanudar</translation>
     </message>
     <message>
-        <source>Clear settings</source>
-        <translation type="unfinished">Borrar configuración</translation>
-    </message>
-    <message>
-        <source>Report a Bug</source>
-        <translation type="unfinished">Informar un error</translation>
-    </message>
-    <message>
         <source>&amp;Minimize to tray</source>
         <translation type="unfinished">&amp;Minimizar a la bandeja</translation>
     </message>
@@ -388,7 +375,7 @@ Do you want to connect to the server?
     <message>
         <source>&amp;Open %1</source>
         <extracomment>%1 will be the replaced with the appname</extracomment>
-        <translation type="unfinished">Abiert&amp;o %1</translation>
+        <translation>Abr&amp;ir %1</translation>
     </message>
     <message>
         <source>&amp;Preferences</source>
@@ -406,6 +393,10 @@ Do you want to connect to the server?
         <source>About %1...</source>
         <extracomment>%1 will be the replaced with the appname</extracomment>
         <translation type="unfinished">Acerca de %1...</translation>
+    </message>
+    <message>
+        <source>View &amp;Help</source>
+        <translation type="unfinished">Ver &amp;ayuda</translation>
     </message>
     <message>
         <source>Ctrl+S</source>
@@ -692,22 +683,6 @@ Además, verifique que puede %1 el archivo de configuración del servidor: %2</t
     <message>
         <source>A new client called &apos;%1&apos; wants to connect</source>
         <translation type="unfinished">Un nuevo cliente llamado &apos;%1&apos; quiere conectarse</translation>
-    </message>
-    <message>
-        <source>%1 Clear Settings</source>
-        <translation type="unfinished">%1 Borrar configuración</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt;&lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;¿Está seguro de que desea borrar todas las configuraciones y reiniciar %1?&lt;/p&gt;&lt;p&gt;Esta acción no se puede deshacer.&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1 Read-only settings</source>
-        <translation type="unfinished">%1 Configuración de solo lectura</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;Settings are read-only because you only have read access to the file:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;Las configuraciones son de solo lectura porque solo tiene acceso de lectura al archivo:&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;</translation>
     </message>
     <message>
         <source>No thanks</source>
@@ -1057,14 +1032,6 @@ Además, verifique que puede %1 el archivo de configuración del servidor: %2</t
         <translation type="unfinished">Activar doble &amp;toque dentro</translation>
     </message>
     <message>
-        <source>Config file</source>
-        <translation type="unfinished">Archivo de configuración</translation>
-    </message>
-    <message>
-        <source>Core server config file</source>
-        <translation type="unfinished">Archivo de configuración del servidor principal</translation>
-    </message>
-    <message>
         <source>Use a server config file to create complex computer layouts that are not possible with the simple grid-based computer layout editor.
 
 Enabling this setting will disable the server config GUI.</source>
@@ -1169,6 +1136,14 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
         <translation type="unfinished">Ejecutar siempre como sistema (funcionar en la pantalla de inicio de sesión y UAC)</translation>
     </message>
     <message>
+        <source>%1 Clear Settings</source>
+        <translation type="unfinished">%1 Borrar configuración</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Are you sure you want to clear all settings and restart %1?&lt;/p&gt; &lt;p&gt;This action cannot be undone.&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;p&gt;¿Está seguro de que desea borrar toda la configuración y reiniciar %1?&lt;/p&gt; &lt;p&gt;Esta acción no se puede deshacer.&lt;/p&gt;</translation>
+    </message>
+    <message>
         <source>Required messages</source>
         <translation type="unfinished">Mensajes obligatorios</translation>
     </message>
@@ -1191,22 +1166,6 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     <message>
         <source>Verbose debug output</source>
         <translation type="unfinished">Salida de depuración detallada</translation>
-    </message>
-    <message>
-        <source>Close and save changes</source>
-        <translation type="unfinished">Cerrar y guardar los cambios</translation>
-    </message>
-    <message>
-        <source>Close and forget changes</source>
-        <translation type="unfinished">Cerrar y olvidar los cambios</translation>
-    </message>
-    <message>
-        <source>Reset to stored values</source>
-        <translation type="unfinished">Restablecer los valores almacenados</translation>
-    </message>
-    <message>
-        <source>Reset to default values</source>
-        <translation type="unfinished">Restablecer valores predeterminados</translation>
     </message>
     <message>
         <source>TLS Certificate Regenerated</source>
@@ -1291,6 +1250,37 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     <message>
         <source>Using a log level higher than Info may affect performance.</source>
         <translation type="unfinished">Utilizar un nivel de registro superior a Info puede afectar el rendimiento.</translation>
+    </message>
+    <message>
+        <source>Remove all settings</source>
+        <translation type="unfinished">Eliminar todas las configuraciones</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsDialogButtonBox</name>
+    <message>
+        <source>Settings are read only</source>
+        <translation type="unfinished">La configuración es de solo lectura</translation>
+    </message>
+    <message>
+        <source>%1 is not writable</source>
+        <translation type="unfinished">%1 no tiene permisos de escritura</translation>
+    </message>
+    <message>
+        <source>Close and save changes</source>
+        <translation type="unfinished">Cerrar y guardar los cambios</translation>
+    </message>
+    <message>
+        <source>Close and forget changes</source>
+        <translation type="unfinished">Cerrar y olvidar los cambios</translation>
+    </message>
+    <message>
+        <source>Reset to stored values</source>
+        <translation type="unfinished">Restablecer los valores almacenados</translation>
+    </message>
+    <message>
+        <source>Reset to default values</source>
+        <translation type="unfinished">Restablecer valores predeterminados</translation>
     </message>
 </context>
 <context>
