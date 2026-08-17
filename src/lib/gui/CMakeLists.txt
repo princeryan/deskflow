@@ -49,8 +49,6 @@ add_library(${target} STATIC
   config/ServerConfig.h
   core/AutoStart.cpp
   core/AutoStart.h
-  core/ClientConnection.cpp
-  core/ClientConnection.h
   core/SystemTheme.cpp
   core/SystemTheme.h
   core/CoreProcess.cpp

@@ -187,8 +187,7 @@ private:
   bool m_secureSocket = false;
   // Tracks connection transitions so we only notify on genuine disconnect/reconnect
   // (not on the very first connect, which has its own welcome message).
-  deskflow::gui::CoreProcess::ConnectionState m_lastConnectionState =
-      deskflow::gui::CoreProcess::ConnectionState::Disconnected;
+  deskflow::core::ConnectionState m_lastConnectionState = deskflow::core::ConnectionState::Disconnected;
   bool m_notifiedDisconnect = false;
   bool m_saveOnExit = true;
   bool m_clientErrorVisible = false;

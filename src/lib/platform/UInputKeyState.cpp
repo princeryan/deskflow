@@ -199,7 +199,7 @@ std::uint32_t UInputKeyState::convertModMask(xkb_mod_mask_t xkbModMaskIn) const
       modMaskOut |= (1 << kKeyModifierBitScrollLock);
     else if ((strcmp(XKB_VMOD_NAME_META, name) == 0) || (strcmp(XKB_MOD_NAME_MOD2, name) == 0) ||
              (strcmp(XKB_MOD_NAME_MOD3, name) == 0))
-      LOG_DEBUG2("modifier mask %s ignored", name);
+      LOG_VERBOSE("modifier mask %s ignored", name);
     else
       LOG_WARN("modifier mask %s not accounted for, this is a bug", name);
   }
@@ -258,7 +258,7 @@ void UInputKeyState::getKeyMap(deskflow::KeyMap &keyMap)
         xkb_keysym_get_name(keysym, keysymName, sizeof(keysymName));
 
         if (strncmp(keysymName, "XF86_Switch_VT_", 15) == 0) {
-          LOG_DEBUG2("skipping VT switch keysym %s for keycode %d", keysymName, keycode);
+          LOG_VERBOSE("skipping VT switch keysym %s for keycode %d", keysymName, keycode);
           continue;
         }
 
@@ -312,7 +312,7 @@ void UInputKeyState::fakeKey(const Keystroke &keystroke)
   if (keystroke.m_type != Keystroke::KeyType::Button)
     return;
 
-  LOG_DEBUG1(
+  LOG_VERBOSE(
       "fake key: %03x (%08x) %s", keystroke.m_data.m_button.m_button, keystroke.m_data.m_button.m_client,
       keystroke.m_data.m_button.m_press ? "down" : "up"
   );

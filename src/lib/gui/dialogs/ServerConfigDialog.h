@@ -65,6 +65,7 @@ protected:
   void toggleWin32Foreground(bool enabled);
 
   void toggleClipboard(bool enabled);
+  void setClipboardLimit(int limit);
 
   void toggleHeartbeat(bool enabled);
   void setHeartbeat(int rate);
