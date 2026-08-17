@@ -111,13 +111,21 @@ elseif(UNIX)
     XDGPowerManager.h
     XDGKeyUtil.h
     XDGKeyUtil.cpp
-    UInputScreen.cpp
-    UInputScreen.h
-    UInputKeyState.cpp
-    UInputKeyState.h
-    UInputClipboardBridge.cpp
-    UInputClipboardBridge.h
   )
+
+  # The uinput backend talks to the Linux evdev/uinput kernel interface
+  # (linux/uinput.h), which no other UNIX has. Everything else here is portable.
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    list(APPEND PLATFORM_SOURCES
+      UInputScreen.cpp
+      UInputScreen.h
+      UInputKeyState.cpp
+      UInputKeyState.h
+      UInputClipboardBridge.cpp
+      UInputClipboardBridge.h
+    )
+    set(HAVE_UINPUT_BACKEND ON)
+  endif()
   if (BUILD_X11_SUPPORT)
     configure_file(XWindowsConfig.h.in XWindowsConfig.h @ONLY)
     list(APPEND PLATFORM_SOURCES
@@ -180,6 +188,10 @@ endif()
 
 # wayland.h is included to check for wayland support
 add_library(platform STATIC ${PLATFORM_SOURCES})
+
+if(HAVE_UINPUT_BACKEND)
+  target_compile_definitions(platform PUBLIC HAVE_UINPUT_BACKEND)
+endif()
 
 target_link_libraries(platform PUBLIC client ${libs})
 

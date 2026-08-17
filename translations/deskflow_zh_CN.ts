@@ -373,6 +373,38 @@ Do you want to connect to the server?
         <translation>您当前的 TLS 密钥长度小于允许的最小值，将生成一个新的 2048 位密钥。</translation>
     </message>
     <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>invalid certificate, generating a new one</source>
         <translation type="unfinished">证书无效，正在生成新证书</translation>
     </message>
@@ -415,6 +447,18 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;连接到服务器“%1”失败。&lt;/p&gt;&lt;p&gt;一个同名的客户端已连接到服务器。&lt;/p&gt;请确保您使用的名称唯一，且只有一个客户端进程实例在运行。&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnected to the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>
@@ -1256,6 +1300,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">移除所有设置</translation>
+    </message>
+    <message>
+        <source>Launch Deskflow automatically when you log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Deskflow on login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a notification when the connection to the server is lost or restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify when the connection is lost or restored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

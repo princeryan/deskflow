@@ -417,6 +417,38 @@ Do you want to connect to the server?
         <translation type="unfinished">Su clave TLS actual es más pequeña que el tamaño mínimo permitido. Se generará una nueva clave de 2048 bits.</translation>
     </message>
     <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Address missing</source>
         <translation type="unfinished">Dirección faltante</translation>
     </message>
@@ -455,6 +487,18 @@ Do you want to connect to the server?
     <message>
         <source>%1 Connection Error</source>
         <translation>%1 Error de conexión</translation>
+    </message>
+    <message>
+        <source>Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnected to the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No IP Detected</source>
@@ -1254,6 +1298,22 @@ Al habilitar esta opción, se deshabilitará la interfaz gráfica de usuario (GU
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">Eliminar todas las configuraciones</translation>
+    </message>
+    <message>
+        <source>Launch Deskflow automatically when you log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Deskflow on login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a notification when the connection to the server is lost or restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify when the connection is lost or restored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -373,6 +373,38 @@ Do you want to connect to the server?
         <translation>현재 TLS 키 길이가 허용되는 최소 길이보다 짧습니다. 새 2048비트 키를 생성합니다.</translation>
     </message>
     <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>invalid certificate, generating a new one</source>
         <translation type="unfinished">유효하지 않은 인증서입니다. 새 인증서를 생성하는 중입니다</translation>
     </message>
@@ -415,6 +447,18 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;서버 &apos;%1&apos;에 연결하지 못했습니다.&lt;/p&gt;&lt;p&gt;같은 이름의 클라이언트가 이미 서버에 연결되어 있습니다.&lt;/p&gt;&lt;p&gt;고유한 이름을 사용하고, 클라이언트 프로세스가 하나만 실행 중인지 확인하세요.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnected to the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>
@@ -1254,6 +1298,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">모든 설정 제거</translation>
+    </message>
+    <message>
+        <source>Launch Deskflow automatically when you log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Deskflow on login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a notification when the connection to the server is lost or restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify when the connection is lost or restored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

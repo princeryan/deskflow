@@ -405,6 +405,38 @@ Vuoi connetterti al server?
         <translation>La tua chiave TLS attuale è più piccola della dimensione minima consentita. Verrà generata una nuova chiave a 2048 bit.</translation>
     </message>
     <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Address missing</source>
         <translation>Indirizzo mancante</translation>
     </message>
@@ -443,6 +475,18 @@ Vuoi connetterti al server?
     <message>
         <source>%1 Connection Error</source>
         <translation>Errore di connessione %1</translation>
+    </message>
+    <message>
+        <source>Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnected to the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No IP Detected</source>
@@ -1254,6 +1298,22 @@ L&apos;abilitazione di questa impostazione disabiliterà l&apos;interfaccia graf
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">Rimuovi tutte le impostazioni</translation>
+    </message>
+    <message>
+        <source>Launch Deskflow automatically when you log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Deskflow on login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a notification when the connection to the server is lost or restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify when the connection is lost or restored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

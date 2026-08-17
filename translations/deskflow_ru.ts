@@ -373,6 +373,38 @@ Do you want to connect to the server?
         <translation>Текущий ключ TLS меньше минимально допустимого размера. Будет создан новый 2048-битный ключ.</translation>
     </message>
     <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>invalid certificate, generating a new one</source>
         <translation>недействительный сертификат, создание нового</translation>
     </message>
@@ -415,6 +447,18 @@ Do you want to connect to the server?
     <message>
         <source>&lt;p&gt;Failed to connect to the server &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;A Client with your name is already connected to the server.&lt;/p&gt;Please ensure that you&apos;re using a unique name and that only a single instance of the client process is running.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Не удалось подключиться к серверу &apos;%1&apos;.&lt;/p&gt;&lt;p&gt;Клиент с таким именем уже подключен к серверу.&lt;/p&gt;Убедитесь, что вы используете уникальное имя и запущен только один процесс клиента.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Deskflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnected from the server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnected to the server.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>View &amp;Help</source>
@@ -1252,6 +1296,22 @@ Enabling this setting will disable the server config GUI.</source>
     <message>
         <source>Remove all settings</source>
         <translation type="unfinished">Удалить все настройки</translation>
+    </message>
+    <message>
+        <source>Launch Deskflow automatically when you log in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Deskflow on login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show a notification when the connection to the server is lost or restored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notify when the connection is lost or restored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

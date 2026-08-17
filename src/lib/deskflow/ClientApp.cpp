@@ -37,7 +37,7 @@
 #include "platform/EiScreen.h"
 #endif
 
-#if defined(WINAPI_XWINDOWS) or defined(WINAPI_LIBEI)
+#if defined(HAVE_UINPUT_BACKEND)
 #include "platform/UInputScreen.h"
 #endif
 
@@ -117,7 +117,7 @@ deskflow::Screen *ClientApp::createScreen()
       new OSXScreen(getEvents(), false, Settings::value(Settings::Client::LanguageSync).toBool()), getEvents()
   );
 #else
-#if defined(WINAPI_XWINDOWS) or defined(WINAPI_LIBEI)
+#if defined(HAVE_UINPUT_BACKEND)
   // Headless kernel-level injection (works at the login/lock screen). Opt in
   // via env var; wins over the display-server backends when set.
   if (qEnvironmentVariableIsSet("DESKFLOW_UINPUT")) {
