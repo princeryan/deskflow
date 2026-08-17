@@ -330,6 +330,67 @@ void UInputKeyState::clearStaleModifiers()
     xkb_state_unref(m_xkbState);
   }
   m_xkbState = xkb_state_new(m_xkbKeymap);
+
+  // A fresh xkb state has every lock off, which is a claim about the session we
+  // are in no position to make. Locks survive this reset; only the held
+  // modifiers were stale.
+  applyLockLeds();
+}
+
+bool UInputKeyState::setLockLeds(KeyModifierMask mask)
+{
+  mask &= (KeyModifierCapsLock | KeyModifierNumLock | KeyModifierScrollLock);
+  if (mask == m_lockLeds) {
+    return false;
+  }
+
+  LOG_DEBUG("uinput: session lock state changed 0x%04x -> 0x%04x", m_lockLeds, mask);
+  m_lockLeds = mask;
+  applyLockLeds();
+
+  // Patch the cached modifier mask in place rather than going through
+  // updateKeyState(): that would also drop every modifier we believe is held,
+  // and a lock can perfectly well change in the middle of a chord.
+  KeyModifierMask &active = getActiveModifiersRValue();
+  active &= ~(KeyModifierCapsLock | KeyModifierNumLock | KeyModifierScrollLock);
+  active |= m_lockLeds;
+  return true;
+}
+
+void UInputKeyState::applyLockLeds()
+{
+  if (m_xkbState == nullptr || m_xkbKeymap == nullptr) {
+    return;
+  }
+
+  // Resolve to the same mask convertModMask() tests against, so what we lock
+  // here is what pollActiveModifiers() reports back.
+  const auto maskFor = [this](const char *name) -> xkb_mod_mask_t {
+    if (xkb_keymap_mod_get_index(m_xkbKeymap, name) == XKB_MOD_INVALID)
+      return 0;
+#ifdef HAVE_XKB_KEYMAP_MOD_GET_MASK
+    return xkb_keymap_mod_get_mask(m_xkbKeymap, name);
+#else
+    return (1U << xkb_keymap_mod_get_index(m_xkbKeymap, name));
+#endif
+  };
+
+  xkb_mod_mask_t locked = 0;
+  if ((m_lockLeds & KeyModifierCapsLock) != 0)
+    locked |= maskFor(XKB_MOD_NAME_CAPS);
+  if ((m_lockLeds & KeyModifierNumLock) != 0)
+    locked |= maskFor("NumLock") | maskFor("Mod2");
+  if ((m_lockLeds & KeyModifierScrollLock) != 0)
+    locked |= maskFor("ScrollLock");
+
+  // Replace only the locked group; whatever is held down right now still is.
+  xkb_state_update_mask(
+      m_xkbState, xkb_state_serialize_mods(m_xkbState, XKB_STATE_MODS_DEPRESSED),
+      xkb_state_serialize_mods(m_xkbState, XKB_STATE_MODS_LATCHED), locked,
+      xkb_state_serialize_layout(m_xkbState, XKB_STATE_LAYOUT_DEPRESSED),
+      xkb_state_serialize_layout(m_xkbState, XKB_STATE_LAYOUT_LATCHED),
+      xkb_state_serialize_layout(m_xkbState, XKB_STATE_LAYOUT_LOCKED)
+  );
 }
 
 } // namespace deskflow

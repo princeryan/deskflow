@@ -41,6 +41,18 @@ public:
   void updateXkbState(std::uint32_t keyval, bool isPressed);
   void clearStaleModifiers() override;
 
+  //! Adopt the lock state the session is actually in.
+  /*!
+  We inject through a kernel device and cannot read the compositor's keyboard
+  state, so our xkb shadow is a guess that drifts the moment anything else
+  toggles a lock -- or the moment we are started while one is already on. The
+  session broadcasts the truth as LED state to every keyboard device, so
+  UInputScreen feeds it back here. \p mask carries KeyModifierCapsLock,
+  KeyModifierNumLock and KeyModifierScrollLock. Returns true if this changed
+  what we believed.
+  */
+  bool setLockLeds(KeyModifierMask mask);
+
 protected:
   // KeyState overrides
   void getKeyMap(KeyMap &keyMap) override;
@@ -49,12 +61,17 @@ protected:
 private:
   std::uint32_t convertModMask(xkb_mod_mask_t xkbModMaskIn) const;
   void assignGeneratedModifiers(std::uint32_t keycode, KeyMap::KeyItem &item);
+  //! Force the xkb shadow's locked modifiers to match m_lockLeds.
+  void applyLockLeds();
 
   UInputScreen *m_screen = nullptr;
 
   xkb_context *m_xkb = nullptr;
   xkb_keymap *m_xkbKeymap = nullptr;
   xkb_state *m_xkbState = nullptr;
+
+  // Lock state as last reported by the session (see setLockLeds).
+  KeyModifierMask m_lockLeds = 0;
 };
 
 } // namespace deskflow

@@ -61,12 +61,23 @@ UInputScreen::UInputScreen(bool isPrimary, IEventQueue *events)
     handleSystemEvent(e);
   });
 
+  // Keep our idea of the session's lock state current. The kernel hands us LED
+  // updates on the keyboard fd, but nothing wakes the event loop for them, so
+  // we look on a timer as well as on enter().
+  m_events->addHandler(EventTypes::Timer, this, [this](const auto &) { pollLockLeds(); });
+  m_ledTimer = m_events->newTimer(0.25, this);
+
   LOG_INFO("uinput screen ready (virtual size %dx%d)", m_w, m_h);
 }
 
 UInputScreen::~UInputScreen()
 {
   m_events->removeHandler(EventTypes::System, m_events->getSystemTarget());
+  if (m_ledTimer != nullptr) {
+    m_events->deleteTimer(m_ledTimer);
+    m_ledTimer = nullptr;
+  }
+  m_events->removeHandler(EventTypes::Timer, this);
   destroyDevices();
   delete m_keyState;
   delete m_clipboardBridge;
@@ -94,8 +105,9 @@ void UInputScreen::syn(int fd) const
 
 void UInputScreen::createDevices()
 {
-  // Keyboard device: all standard evdev key codes.
-  m_keyboardFd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+  // Keyboard device: all standard evdev key codes. Opened read-write because we
+  // also want what the kernel sends back to us (see pollLockLeds).
+  m_keyboardFd = open("/dev/uinput", O_RDWR | O_NONBLOCK);
   if (m_keyboardFd < 0)
     throw std::runtime_error(std::string("uinput: cannot open /dev/uinput for keyboard: ") + strerror(errno));
 
@@ -103,6 +115,16 @@ void UInputScreen::createDevices()
   ioctl(m_keyboardFd, UI_SET_EVBIT, EV_SYN);
   for (int k = 0; k < 256; k++)
     ioctl(m_keyboardFd, UI_SET_KEYBIT, k);
+
+  // Claiming the lock LEDs is what makes the session tell us its lock state:
+  // X11 and every Wayland compositor push LED updates to all keyboards that
+  // have them, and for a uinput device those land back on this fd. Without it
+  // our idea of Caps Lock is a guess that drifts the first time anything else
+  // toggles it, and a Caps Lock stuck on has no way to ever be noticed.
+  ioctl(m_keyboardFd, UI_SET_EVBIT, EV_LED);
+  ioctl(m_keyboardFd, UI_SET_LEDBIT, LED_CAPSL);
+  ioctl(m_keyboardFd, UI_SET_LEDBIT, LED_NUML);
+  ioctl(m_keyboardFd, UI_SET_LEDBIT, LED_SCROLLL);
 
   struct uinput_setup kb = {};
   kb.id.bustype = BUS_VIRTUAL;
@@ -170,6 +192,46 @@ void UInputScreen::destroyDevices()
 //
 // injection
 //
+
+void UInputScreen::pollLockLeds()
+{
+  if (m_keyboardFd < 0 || m_keyState == nullptr)
+    return;
+
+  // Drain everything the kernel has for us; only the last value of each LED
+  // matters. Reads are non-blocking, so an empty queue just gives EAGAIN.
+  bool sawLed = false;
+  struct input_event ev = {};
+  while (read(m_keyboardFd, &ev, sizeof(ev)) == static_cast<ssize_t>(sizeof(ev))) {
+    if (ev.type != EV_LED)
+      continue;
+
+    KeyModifierMask bit = 0;
+    switch (ev.code) {
+    case LED_CAPSL:
+      bit = KeyModifierCapsLock;
+      break;
+    case LED_NUML:
+      bit = KeyModifierNumLock;
+      break;
+    case LED_SCROLLL:
+      bit = KeyModifierScrollLock;
+      break;
+    default:
+      continue;
+    }
+
+    sawLed = true;
+    if (ev.value != 0)
+      m_lockLeds |= bit;
+    else
+      m_lockLeds &= ~bit;
+  }
+
+  if (sawLed) {
+    m_keyState->setLockLeds(m_lockLeds);
+  }
+}
 
 void UInputScreen::fakeKey(std::uint32_t keycode, bool isDown) const
 {
@@ -308,6 +370,9 @@ void UInputScreen::disable()
 void UInputScreen::enter()
 {
   m_isOnScreen = true;
+  // Anything could have happened to Caps Lock while we were away; find out
+  // before the first key of this visit is mapped.
+  pollLockLeds();
   // Flush the position latched before we were on-screen. This must be forced:
   // entering at the same edge position as last time leaves the latched value
   // equal to our shadow, and anything else sharing the seat may have moved the

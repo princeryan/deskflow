@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <string>
 
+class EventQueueTimer;
+
 namespace deskflow {
 
 class UInputKeyState;
@@ -82,6 +84,8 @@ protected:
 private:
   void createDevices();
   void destroyDevices();
+  //! Read back the lock LEDs the session has set on our virtual keyboard.
+  void pollLockLeds();
   void sendClipboardEvent(EventTypes type, ClipboardID id) const;
   //! Emit one evdev event followed by a SYN_REPORT is done separately.
   void emit(int fd, std::uint16_t type, std::uint16_t code, std::int32_t value) const;
@@ -99,6 +103,9 @@ private:
 
   int m_keyboardFd = -1;
   int m_pointerFd = -1;
+
+  EventQueueTimer *m_ledTimer = nullptr;
+  KeyModifierMask m_lockLeds = 0;
 
   // Virtual screen geometry (also the absolute-axis range).
   std::int32_t m_x = 0;
