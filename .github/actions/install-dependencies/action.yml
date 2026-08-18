@@ -51,7 +51,11 @@ runs:
                 qt6-linguist-devel libxkbcommon-devel libxkbcommon-x11-devel libxkbregistry-devel \
                 libei-devel libportal-devel help2man libXinerama-devel libXrandr-devel
             elif [ ${{ inputs.like }} == "arch" ]; then
-              pacman -Syu --noconfirm base-devel cmake ninja \
+              # -yy, not -y: the archlinux image ships a package database that is
+              # usually older than the mirrors, and pacman will happily try to
+              # fetch a version that has already been rotated out and 404. Force
+              # a full database refresh so it asks for what is actually there.
+              pacman -Syyu --noconfirm base-devel cmake ninja \
                 gcc openssl libxtst libxkbfile libei libportal libxkbcommon-x11 \
                 qt6-base qt6-tools qt6-svg qt6-translations qt6-declarative help2man doxygen graphviz rsync libxkbcommon libxinerama libxrandr
             else
