@@ -446,8 +446,16 @@ jobs:
         run: |
           # Container jobs upload with the absolute workspace path preserved, so
           # the installers can sit deeper than package-*/, and the Debian package
-          # is named with an underscore. Collect on both counts.
-          find $GITHUB_WORKSPACE/package-* -type f -name 'deskflow[-_]*' -exec mv -t . {} +
+          # is named with an underscore. Match on package suffixes rather than on
+          # the name alone: this fork also ships deskflow-*.service unit files in
+          # the build dir, every Linux job uploads a copy, and mv refuses to
+          # overwrite the one that got there first.
+          find $GITHUB_WORKSPACE/package-* -type f \
+            \( -name 'deskflow[-_]*.deb' -o -name 'deskflow[-_]*.rpm' \
+               -o -name 'deskflow[-_]*.dmg' -o -name 'deskflow[-_]*.msi' \
+               -o -name 'deskflow[-_]*.7z' -o -name 'deskflow[-_]*.flatpak' \
+               -o -name 'deskflow[-_]*.pkg.tar.zst' -o -name 'deskflow[-_]*.exe' \) \
+            -exec mv -n -t . {} +
           rm -rf $GITHUB_WORKSPACE/package-*
           echo "Build: ${{env.DESKFLOW_VERSION }}" > sums.txt
           sha256sum deskflow[-_]* >> sums.txt
