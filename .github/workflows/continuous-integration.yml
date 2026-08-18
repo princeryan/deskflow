@@ -429,6 +429,10 @@ jobs:
     needs: ci-passed
     if: (github.ref == 'refs/heads/master') || (contains(github.ref, '/tags/v'))
     runs-on: ubuntu-latest
+    # Creating and deleting the continuous release needs write access. Upstream
+    # gets it from its org default; a fork's token is read-only unless asked.
+    permissions:
+      contents: write
 
     steps:
       - name: Fancy Checkout
