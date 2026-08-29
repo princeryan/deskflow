@@ -1,0 +1,5 @@
+<map id="deskflow::gui::SystemTheme" name="deskflow::gui::SystemTheme">
+<area shape="rect" id="Node000001" title="Applies a clean, system&#45;following theme (light/dark + accent) to the app." alt="" coords="5,78,195,103"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="65,5,135,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,44,102,79,98,77,98,48"/>
+</map>

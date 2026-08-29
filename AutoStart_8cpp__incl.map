@@ -1,0 +1,15 @@
+<map id="src/lib/gui/core/AutoStart.cpp" name="src/lib/gui/core/AutoStart.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="259,5,449,30"/>
+<area shape="rect" id="Node000002" href="$AutoStart_8h.html" title=" " alt="" coords="5,78,122,103"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="307,33,127,77,126,71,306,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="146,78,269,103"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="333,30,247,73,245,68,327,31"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="293,78,341,103"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="350,29,332,66,328,62,346,32"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="365,78,418,103"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="362,28,381,65,376,63,359,33"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="442,78,517,103"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="376,28,448,70,443,70,374,33"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="541,78,639,103"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="394,28,539,73,534,73,393,33"/>
+</map>
