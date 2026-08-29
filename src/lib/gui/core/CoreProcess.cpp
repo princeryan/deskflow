@@ -161,8 +161,13 @@ void CoreProcess::checkExistingProcess()
 
   auto *client = new ipc::CoreIpcClient(this);
   connect(client, &ipc::CoreIpcClient::connected, this, [client] {
-    qInfo("existing core has matching version, leaving it running");
-    client->deleteLater();
+    // We only get here because this gui just tried to start a core and was told
+    // one is already running. Walking away strands that core: it is not our
+    // child, so the tray cannot stop it and the status bar never reflects it.
+    // Stop it and let serverShutdown queue the retry, so launching the app
+    // restarts the core instead of leaving an unreachable one behind.
+    qInfo("existing core has matching version, asking it to stop so we can restart it");
+    client->sendStop();
   });
   connect(client, &ipc::CoreIpcClient::versionMismatch, this, [client] {
     qInfo("existing core has mismatched version, asking it to stop");
@@ -175,9 +180,14 @@ void CoreProcess::checkExistingProcess()
     m_retryTimer.setSingleShot(true);
     m_retryTimer.start(kRetryDelay);
   });
-  connect(client, &ipc::CoreIpcClient::connectionFailed, this, [client] {
+  connect(client, &ipc::CoreIpcClient::connectionFailed, this, [this, client] {
+    // Something holds the single-instance lock but will not talk to us, so it can
+    // neither be stopped nor adopted. Surface that instead of sitting silently in
+    // Stopped with a core the user has no way to reach.
     qCritical("could not contact existing core");
     client->deleteLater();
+    setProcessState(ProcessState::Stopped);
+    Q_EMIT error(Error::StartFailed);
   });
   client->connectToServer();
 }
@@ -281,26 +291,29 @@ void CoreProcess::startProcessFromDaemon()
   }
 }
 
-void CoreProcess::stopForegroundProcess() const
+void CoreProcess::stopForegroundProcess()
 {
   if (m_processState != ProcessState::Stopping) {
     qCritical("not stopping core desktop process, unexpected process state");
     return;
   }
 
-  if (!m_process) {
-    qCritical("not stopping core desktop process, no process to stop");
+  qInfo("stopping core desktop process");
+
+  // Only QProcess::finished drives the state on to Stopped. When there is no
+  // live child to wait on -- the retry timer has not respawned one yet, or the
+  // start never got that far -- returning here used to pin the state at Stopping
+  // forever: the tray then shows the core as neither running nor stopped, and
+  // quitting in that state records it as "not running" and disables autostart,
+  // so the next launch comes up with no core at all. Settle it ourselves.
+  if (!m_process || m_process->state() != QProcess::ProcessState::Running) {
+    qDebug("no running core desktop process, nothing to close");
+    setProcessState(ProcessState::Stopped);
     return;
   }
 
-  qInfo("stopping core desktop process");
-
-  if (m_process->state() == QProcess::ProcessState::Running) {
-    qDebug("process is running, closing");
-    m_process->close();
-  } else {
-    qDebug("process is not running, skipping terminate");
-  }
+  qDebug("process is running, closing");
+  m_process->close();
 }
 
 void CoreProcess::stopProcessFromDaemon()
@@ -485,6 +498,14 @@ void CoreProcess::start(std::optional<ProcessMode> processModeOption)
 
 void CoreProcess::stop(std::optional<ProcessMode> processModeOption)
 {
+  // Cancel a queued retry before anything else. A stop that leaves the timer
+  // armed lets a fresh core appear moments after the user asked for none, and
+  // one that starts while the gui is shutting down survives it as an orphan
+  // that the next launch then trips over.
+  if (m_retryTimer.isActive()) {
+    m_retryTimer.stop();
+  }
+
   if (m_externalService) {
     stopExternalService();
     return;
@@ -675,8 +696,11 @@ void CoreProcess::cleanup()
   qInfo("cleaning up core process");
 
   const auto isDesktop = Settings::value(Settings::Core::ProcessMode).value<ProcessMode>() == ProcessMode::Desktop;
-  const auto isRunning = m_processState == ProcessState::Started;
-  if (isDesktop && isRunning) {
+
+  // isActive() rather than a strict "started" check: a core that is still
+  // starting is a real process, and leaving it running past the gui is exactly
+  // what produces the unreachable core that blocks the next launch.
+  if (isDesktop && isActive()) {
     stop();
   }
 }

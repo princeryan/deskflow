@@ -61,6 +61,21 @@ public:
   {
     return m_processState == ProcessState::Started;
   }
+  /**
+   * @brief True while a core is meant to be running: starting, started, or
+   * waiting on a retry after an exit.
+   *
+   * isStarted() answers the strict "is it up this instant" question. Callers
+   * deciding whether the user may stop the core, or whether it should come back
+   * on the next launch, need the wider one: without it a core that is starting
+   * or churning through retries is indistinguishable from one the user
+   * deliberately stopped.
+   */
+  bool isActive() const
+  {
+    using enum ProcessState;
+    return m_processState == Starting || m_processState == Started || m_processState == RetryPending;
+  }
   ProcessState processState() const
   {
     return m_processState;
@@ -105,7 +120,7 @@ private Q_SLOTS:
 private:
   void startForegroundProcess(const QStringList &args);
   void startProcessFromDaemon();
-  void stopForegroundProcess() const;
+  void stopForegroundProcess();
   void stopProcessFromDaemon();
   // Drive the headless login-screen client service instead of launching our own
   // core, so the GUI is a front-end for the running service.

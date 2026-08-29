@@ -1146,7 +1146,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
   if (m_saveOnExit) {
     Settings::setValue(Settings::Gui::WindowGeometry, geometry());
-    Settings::setValue(Settings::Gui::AutoStartCore, m_coreProcess.isStarted());
+    // isActive(), not isStarted(): quitting while the core is starting or between
+    // retries would otherwise record "the core was not running" and silently turn
+    // autostart off, so opening the app or its shortcut again comes up with no
+    // core and no indication why.
+    Settings::setValue(Settings::Gui::AutoStartCore, m_coreProcess.isActive());
   }
   qDebug() << "quitting application";
 
@@ -1475,11 +1479,15 @@ void MainWindow::daemonIpcClientConnectionFailed()
 
 void MainWindow::toggleCanRunCore(bool enableButtons)
 {
-  const bool isStarted = m_coreProcess.isStarted();
+  // isActive(), not isStarted(): a core that is starting or waiting on a retry is
+  // running as far as the user is concerned. Greying out Stop while it churns
+  // takes away the one control that ends it, and these actions are the same
+  // objects the tray menu shows, so the tray goes dead with it.
+  const bool isActive = m_coreProcess.isActive();
   ui->btnToggleCore->setEnabled(enableButtons);
-  ui->btnRestartCore->setEnabled(enableButtons && isStarted);
+  ui->btnRestartCore->setEnabled(enableButtons && isActive);
   m_actionStartCore->setEnabled(enableButtons);
-  m_actionStopCore->setEnabled(enableButtons && isStarted);
+  m_actionStopCore->setEnabled(enableButtons && isActive);
 }
 
 void MainWindow::remoteHostChanged(const QString &newRemoteHost)
